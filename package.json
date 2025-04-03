@@ -1,0 +1,23 @@
+{
+  "name": "csce679_final_project",
+  "version": "1.0.0",
+  "description": "CSCE 679 Data Visualization Final Project - Andrew Zehrer, Kai Zhao, Steve Wang",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andrewzehrer/csce679_final_project.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/andrewzehrer/csce679_final_project/issues"
+  },
+  "homepage": "https://github.com/andrewzehrer/csce679_final_project#readme",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
