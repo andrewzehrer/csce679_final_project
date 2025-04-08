@@ -64,10 +64,9 @@ async function loadSeasons() {
     }
 }
 
-
 async function fetchPlayerStats() {
     const playerName = document.getElementById("playerNameInput").value;
-    const seasonYear = document.getElementById("seasonDropdown").value;
+    const seasonYear = document.getElementById("seasonDropdown").value.slice(0, 4);
     const url = `http://localhost:5000/player-games?name=${encodeURIComponent(playerName)}&season=${encodeURIComponent(seasonYear)}`;
     const outputDiv = document.getElementById("output");
     outputDiv.innerText = "Loading...";
