@@ -1,3 +1,14 @@
+let inputTimeout;
+
+function handlePlayerInput() {
+    clearTimeout(inputTimeout);
+    fetchPlayerSuggestions();
+
+    inputTimeout = setTimeout(() => {
+        loadSeasons();
+    }, 1000); // delay to reduce redundant fetches
+}
+
 async function fetchPlayerSuggestions() {
     const input = document.getElementById("playerNameInput");
     const datalist = document.getElementById("playerSuggestions");
@@ -29,10 +40,7 @@ async function loadSeasons() {
     const playerName = document.getElementById("playerNameInput").value;
     const dropdown = document.getElementById("seasonDropdown");
 
-    if (!playerName.trim()) {
-        alert("Please enter a player name.");
-        return;
-    }
+    if (!playerName.trim()) return;
 
     dropdown.style.display = "none";
     dropdown.innerHTML = "<option>Loading...</option>";
@@ -44,11 +52,10 @@ async function loadSeasons() {
         if (res.status !== 200 || seasons.length === 0) {
             dropdown.innerHTML = "";
             dropdown.style.display = "none";
-            alert("No seasons found for this player.");
             return;
         }
 
-        dropdown.innerHTML = ""; // Clear existing options
+        dropdown.innerHTML = "";
         seasons.forEach(season => {
             const option = document.createElement("option");
             option.value = season;
@@ -57,9 +64,17 @@ async function loadSeasons() {
         });
 
         dropdown.style.display = "inline-block";
+
+        const defaultSeason = "2024-25";
+        if (seasons.includes(defaultSeason)) {
+            dropdown.value = defaultSeason;
+        } else {
+            dropdown.selectedIndex = 0;
+        }
+
+        fetchPlayerStats(); // ← always call this here
     } catch (err) {
         console.error("Error fetching seasons:", err);
-        alert("Error loading seasons. Check console.");
         dropdown.style.display = "none";
     }
 }
@@ -140,4 +155,8 @@ async function fetchPlayerStats() {
     }
 }
 
-window.onload = () => fetchPlayerStats();
+window.onload = () => {
+    document.getElementById("playerNameInput").value = "LeBron James"; // or any default player
+    document.getElementById("seasonDropdown").addEventListener("change", fetchPlayerStats);
+    handlePlayerInput(); // triggers suggestions + seasons + stats
+}

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NBA Player Game Log</title>
+    <title>NBA Stat Viz</title>
     <link rel="stylesheet" href="styles.css">
     <script src="./scripts.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
@@ -20,19 +20,13 @@
             id="playerNameInput" 
             placeholder="Enter player name" 
             list="playerSuggestions" 
-            oninput="fetchPlayerSuggestions()"
+            oninput="handlePlayerInput()"
         />
         <!-- Datalist for auto-suggestions -->
         <datalist id="playerSuggestions"></datalist>
 
-        <!-- Load Seasons Button -->
-        <button onclick="loadSeasons()">Load Seasons</button>
-
         <!-- Season Dropdown -->
-        <select id="seasonDropdown" style="display:none;"></select>
-
-        <!-- Fetch Player Stats Button -->
-        <button onclick="fetchPlayerStats()">Search</button>
+        <select id="seasonDropdown" style="display: inline;" value="2024-25"></select>
     </div>
 
     <div id="output" style="margin-top: 20px;"></div>
