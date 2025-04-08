@@ -3,25 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Node.js App</title>
+    <title>NBA Player Game Log</title>
     <link rel="stylesheet" href="styles.css">
     <script src="./scripts.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
-    
 </head>
 <body>
     <h2>NBA Player Game Log</h2>
-    <div id="output"></div>
-  
+
     <div id="inputs">
-        <input type="text" id="playerNameInput" placeholder="Enter player name">
-        <input type="text" id="seasonInput" placeholder="Season (e.g., 2023)">
+        <!-- Input field with auto-suggestions -->
+        <input 
+            type="text" 
+            id="playerNameInput" 
+            placeholder="Enter player name" 
+            list="playerSuggestions" 
+            oninput="fetchPlayerSuggestions()"
+        />
+        <!-- Datalist for auto-suggestions -->
+        <datalist id="playerSuggestions"></datalist>
+
+        <!-- Load Seasons Button -->
+        <button onclick="loadSeasons()">Load Seasons</button>
+
+        <!-- Season Dropdown -->
+        <select id="seasonDropdown" style="display:none;"></select>
+
+        <!-- Fetch Player Stats Button -->
         <button onclick="fetchPlayerStats()">Search</button>
     </div>
 
+    <div id="output" style="margin-top: 20px;"></div>
     <div id="vis" style="margin-top: 30px;"></div>
 
+    <script>
+        // Fetch player suggestions for auto-complete
+        
+
+       
+    </script>
 </body>
 </html>
