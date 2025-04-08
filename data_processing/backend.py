@@ -44,6 +44,5 @@ def player_games():
     filtered = df[["GAME_DATE", "MATCHUP", "WL", "PTS", "AST", "REB", "STL", "BLK"]]
     return jsonify(filtered.to_dict(orient="records"))
 
-
 if __name__ == "__main__":
     app.run(debug=True)

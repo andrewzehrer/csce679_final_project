@@ -15,43 +15,69 @@
     <div id="output"></div>
 
     <script>
-        async function fetchPlayerStats(player, season) {
-            const playerName = player;
-            const seasonYear = season;
-            const url = `http://localhost:5000/player-stats?name=${encodeURIComponent(playerName)}&season=${encodeURIComponent(seasonYear)}`;
+        async function fetchPlayerStats() {
+            const playerName = document.getElementById("playerNameInput").value;
+            const seasonYear = document.getElementById("seasonInput").value;
+            const url = `http://localhost:5000/player-games?name=${encodeURIComponent(playerName)}&season=${encodeURIComponent(seasonYear)}`;
             const outputDiv = document.getElementById("output");
+            outputDiv.innerText = "Loading...";
+
             try {
-                const res = await fetch("http://localhost:5000/player-stats?name=LeBron%20James");
-                if (!res.ok) {
-                    throw new Error("Server responded with status " + res.status);
+                const res = await fetch("http://localhost:5000/player-games?name=" + encodeURIComponent(playerName) + "&season=" + encodeURIComponent(seasonYear), {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                });
+
+                if (res.status === 404) {
+                    outputDiv.innerText = "Player not found. Please check the name and try again.";
+                    return;
+                } else if (res.status === 400) {
+                    outputDiv.innerText = "Invalid request. Please check the input values.";
+                    return;
+                } else if (!res.ok) {
+                    outputDiv.innerText = "Error fetching data. Please try again later.";
+                    return;
                 }
+
                 const data = await res.json();
 
                 if (data.error) {
                     alert(data.error);
+                    outputDiv.innerText = "No data found.";
                     return;
                 }
 
-                const filtered = data.filter(d => d.PTS !== null && !isNaN(d.PTS));
+                const filtered = data.filter(d => {
+                    const gameDate = new Date(d.GAME_DATE);
+                    const startDate = new Date(`${seasonYear}-10-01`); // Start of the season
+                    const endDate = new Date(`${seasonYear + 1}-04-30`); // End of the season
+                    return gameDate >= startDate && gameDate <= endDate;
+                });
+                if (filtered.length === 0) {
+                    outputDiv.innerText = "No data found for the specified player and season.";
+                    return;
+                }
 
                 const spec = {
                     "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-                    "description": `Total points per season for ${player}`,
+                    // "description": `Total points per season for ${playerName}`,
                     "data": { "values": filtered },
                     "mark": "bar",
                     "encoding": {
                         "x": {
-                            "field": "SEASON_ID",
-                            "type": "ordinal",
-                            "title": "Season",
-                            "sort": "ascending"
+                            "field": "GAME_DATE",
+                            "type": "temporal",
+                            "title": "Game Date"
                         }, "y": {
                             "field": "PTS",
                             "type": "quantitative",
-                            "title": "Total Points"
+                            "title": "Points",
+                            "axis": { "grid": true }
                         }, "tooltip": [
-                            { "field": "SEASON_ID", "type": "ordinal" },
-                            { "field": "PTS", "type": "quantitative", "title": "Total Points" },
+                            { "field": "GAME_DATE", "type": "temporal", "title": "Game Date" },
+                            { "field": "PTS", "type": "quantitative", "title": "Points" },
                             { "field": "AST", "type": "quantitative", "title": "Assists" },
                             { "field": "REB", "type": "quantitative", "title": "Rebounds" }
                         ]
@@ -59,18 +85,20 @@
                 };
 
                 vegaEmbed("#vis", spec);
+                outputDiv.innerText = "";
             } catch (err) {
                 console.error("Fetch error:", err);
                 document.getElementById("output").innerText = "Error fetching data. Check console.";
             }
         }
 
-        fetchPlayerStats("LeBron James", "2023");
+        window.onload = () => fetchPlayerStats();
+
     </script>
   
-    <input type="text" id="playerName" placeholder="Enter player name" value="LeBron James">
-    <input type="text" id="season" placeholder="Season (e.g., 2023)" value="2023">
-    <button onclick="fetchGameLogs()">Search</button>
+    <input type="text" id="playerNameInput" placeholder="Enter player name">
+    <input type="text" id="seasonInput" placeholder="Season (e.g., 2023)">
+    <button onclick="fetchPlayerStats()">Search</button>
 
     <div id="vis" style="margin-top: 30px;"></div>
 </body>
