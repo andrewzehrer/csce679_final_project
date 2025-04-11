@@ -1,8 +1,8 @@
 let inputTimeout;
 
-const easternConf = ["ATL", "BOS", "BRK", "CHA", "CHI", "CLE", "DET", "IND", "MIA", "MIL", "NYK", "ORL", "PHI", "TOR", "WAS"];
-const westernConf = ["DAL", "DEN", "GSW", "HOU", "LAC", "LAL", "MEM", "MIN", "NOP", "OKC", "PHX", "POR", "SAC", "SAS", "UTA"];
-const allTeams = [...easternConf, ...westernConf];
+// const easternConf = ["ATL", "BOS", "BRK", "CHA", "CHI", "CLE", "DET", "IND", "MIA", "MIL", "NYK", "ORL", "PHI", "TOR", "WAS"];
+// const westernConf = ["DAL", "DEN", "GSW", "HOU", "LAC", "LAL", "MEM", "MIN", "NOP", "OKC", "PHX", "POR", "SAC", "SAS", "UTA"];
+// const allTeams = [...easternConf, ...westernConf];
 
 function getGraphTitle() {
     const playerName = document.getElementById("playerNameInput").value;
@@ -116,16 +116,17 @@ async function fetchPlayerStats() {
 
     const homeAwayFilter = document.getElementById("locationDropdown").value;
     const teamFilter = document.getElementById("teamDropdown").value;
-    let teamFilterList = allTeams;
-    if (teamFilter !== "all") {
-        if (teamFilter === "Eastern") {
-            teamFilterList = easternConf;
-        } else if (teamFilter === "Western") {
-            teamFilterList = westernConf;
-        } else {
-            teamFilterList = [teamFilter];
-        }
-    }
+    // let teamFilterList = allTeams;
+    // if (teamFilter !== "all") {
+    //     if (teamFilter === "Eastern") {
+    //         teamFilterList = easternConf;
+    //     } else if (teamFilter === "Western") {
+    //         teamFilterList = westernConf;
+    //     } else {
+    //         teamFilterList = [teamFilter];
+    //     }
+    // }
+
     const resultFilter = document.getElementById("resultDropdown").value;
 
     const url = `http://localhost:5000/player-games?name=${encodeURIComponent(playerName)}&season=${encodeURIComponent(seasonYear)}`;
@@ -163,14 +164,6 @@ async function fetchPlayerStats() {
             const gameDate = new Date(d.GAME_DATE);
             const startDate = new Date(`${seasonYear}-10-01`); // Start of the season
             const endDate = new Date(`${seasonYear + 1}-04-30`); // End of the season
-            if (homeAwayFilter === "home") {
-                // MATCHUP contains "vs." for home games
-                return d.MATCHUP.includes("vs.") && gameDate >= startDate && gameDate <= endDate;
-            }
-            else if (homeAwayFilter === "away") {
-                // MATCHUP contains "@" for away games
-                return d.MATCHUP.includes("@") && gameDate >= startDate && gameDate <= endDate;
-            }
             return gameDate >= startDate && gameDate <= endDate;
         });
 
@@ -179,7 +172,29 @@ async function fetchPlayerStats() {
             return;
         }
 
-        const testExpr = teamFilter === "all" ? "true" : `indexof(datum.MATCHUP, '${teamFilter}') !== -1`;
+        const locationExpr = homeAwayFilter === "all"
+            ? "true"
+            : homeAwayFilter === "home"
+                ? `indexof(datum.MATCHUP, 'vs.') !== -1`
+                : `indexof(datum.MATCHUP, '@') !== -1`;        
+        
+        // const teamExpr = teamFilterList.length === 0
+        //     ? "true"
+        //     : teamFilterList
+        //         .map(team => `indexof(datum.MATCHUP, '${team}') !== -1`)
+        //         .join(" || ");
+
+        const teamExpr = teamFilter === "all"
+            ? "true"
+            : `indexof(datum.MATCHUP, '${teamFilter}') !== -1`;
+
+        const resultExpr = resultFilter === "all"
+            ? "true"
+            : resultFilter === "W"
+                ? `datum.WL === 'W'`
+                : `datum.WL === 'L'`;
+
+        const testExpr = `${locationExpr} && ${teamExpr} && ${resultExpr}`;
 
         const spec = {
             "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
@@ -223,7 +238,6 @@ async function fetchPlayerStats() {
             }
         };
 
-        console.log("Team filter:", teamFilter)
         vegaEmbed("#vis", spec);
         outputDiv.innerText = "";
     } catch (err) {
