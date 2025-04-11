@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NBA Stat Viz</title>
+    <title>NBA Player Game Log</title>
     <link rel="stylesheet" href="styles.css">
     <script src="./scripts.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
@@ -29,7 +29,69 @@
         <select id="seasonDropdown" style="display: inline;" value="2024-25"></select>
     </div>
 
-    <div id="output" style="margin-top: 20px;"></div>
+    <div id="statSelection" style="margin-top: 20px;">
+        <!-- radio buttons for each stat -->
+        <label><input type="radio" name="stat" value="PTS" checked> Points</label>
+        <label><input type="radio" name="stat" value="AST"> Assists</label> 
+        <label><input type="radio" name="stat" value="REB"> Rebounds</label>
+        <label><input type="radio" name="stat" value="STL"> Steals</label>
+        <label><input type="radio" name="stat" value="BLK"> Blocks</label>
+    </div>
+
+    <div id="filterSelection" style="margin-top: 20px;">
+        <!-- Dropdown for all/home/away -->
+        <label for="locationDropdown">Location:</label>
+        <select id="locationDropdown" style="display: inline;">
+            <option value="all">All</option>
+            <option value="home">Home</option>
+            <option value="away">Away</option>
+        </select>
+        <label for="teamDropdown">Vs:</label>
+        <select id="teamDropdown" style="display: inline;">
+            <option value="all">All Teams</option>
+            <option>Eastern</option>
+            <option>Western</option>
+            <option>ATL</option>
+            <option>BOS</option>
+            <option>BRK</option>
+            <option>CHA</option>
+            <option>CHI</option>
+            <option>CLE</option>
+            <option>DAL</option>
+            <option>DEN</option>
+            <option>DET</option>
+            <option>GSW</option>
+            <option>HOU</option>
+            <option>IND</option>
+            <option>LAC</option>
+            <option>LAL</option>
+            <option>MEM</option>
+            <option>MIA</option>
+            <option>MIL</option>
+            <option>MIN</option>
+            <option>NOP</option>
+            <option>NYK</option>
+            <option>OKC</option>
+            <option>ORL</option>
+            <option>PHI</option>
+            <option>PHX</option>
+            <option>POR</option>
+            <option>SAC</option>
+            <option>SAS</option>
+            <option>TOR</option>
+            <option>UTA</option>
+            <option>WAS</option>
+        </select>
+        <label for="resultDropdown">Result:</label>
+        <select id="resultDropdown" style="display: inline;">
+            <option value="all">All</option>
+            <option value="W">Wins</option>
+            <option value="L">Losses</option>
+        </select>
+    </div>
+
     <div id="vis" style="margin-top: 30px;"></div>
+    <div id="output" style="margin-top: 20px;"></div>
+
 </body>
 </html>

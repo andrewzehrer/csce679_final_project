@@ -1,5 +1,35 @@
 let inputTimeout;
 
+const easternConf = ["ATL", "BOS", "BRK", "CHA", "CHI", "CLE", "DET", "IND", "MIA", "MIL", "NYK", "ORL", "PHI", "TOR", "WAS"];
+const westernConf = ["DAL", "DEN", "GSW", "HOU", "LAC", "LAL", "MEM", "MIN", "NOP", "OKC", "PHX", "POR", "SAC", "SAS", "UTA"];
+const allTeams = [...easternConf, ...westernConf];
+
+function getGraphTitle() {
+    const playerName = document.getElementById("playerNameInput").value;
+    const seasonYear = document.getElementById("seasonDropdown").value.slice(0, 4);
+    const selectedStat = getSelectedStat();
+    const homeAwayFilter = document.getElementById("locationDropdown").value;
+    const homeAwayText = homeAwayFilter === "all" ? "" : `(${homeAwayFilter.charAt(0).toUpperCase() + homeAwayFilter.slice(1)})`;
+    const teamFilter = document.getElementById("teamDropdown").value;
+    const teamText = teamFilter === "all" ? "" : `(vs. ${teamFilter})`;
+    
+    const statText = {
+        "PTS": "Points",
+        "AST": "Assists",
+        "REB": "Rebounds",
+        "STL": "Steals",
+        "BLK": "Blocks"
+    };
+    const selectedStatText = statText[selectedStat];
+
+    return `${playerName} - ${seasonYear}-${(parseInt(seasonYear) + 1).toString().slice(-2)} ${selectedStatText} ${homeAwayText} ${teamText}`;
+}
+
+function getSelectedStat() {
+    const selectedRadio = document.querySelector('input[name="stat"]:checked');
+    return selectedRadio.value;
+}
+
 function handlePlayerInput() {
     clearTimeout(inputTimeout);
     fetchPlayerSuggestions();
@@ -82,6 +112,22 @@ async function loadSeasons() {
 async function fetchPlayerStats() {
     const playerName = document.getElementById("playerNameInput").value;
     const seasonYear = document.getElementById("seasonDropdown").value.slice(0, 4);
+    const selectedStat = getSelectedStat();
+
+    const homeAwayFilter = document.getElementById("locationDropdown").value;
+    const teamFilter = document.getElementById("teamDropdown").value;
+    let teamFilterList = allTeams;
+    if (teamFilter !== "all") {
+        if (teamFilter === "Eastern") {
+            teamFilterList = easternConf;
+        } else if (teamFilter === "Western") {
+            teamFilterList = westernConf;
+        } else {
+            teamFilterList = [teamFilter];
+        }
+    }
+    const resultFilter = document.getElementById("resultDropdown").value;
+
     const url = `http://localhost:5000/player-games?name=${encodeURIComponent(playerName)}&season=${encodeURIComponent(seasonYear)}`;
     const outputDiv = document.getElementById("output");
     outputDiv.innerText = "Loading...";
@@ -117,36 +163,67 @@ async function fetchPlayerStats() {
             const gameDate = new Date(d.GAME_DATE);
             const startDate = new Date(`${seasonYear}-10-01`); // Start of the season
             const endDate = new Date(`${seasonYear + 1}-04-30`); // End of the season
+            if (homeAwayFilter === "home") {
+                // MATCHUP contains "vs." for home games
+                return d.MATCHUP.includes("vs.") && gameDate >= startDate && gameDate <= endDate;
+            }
+            else if (homeAwayFilter === "away") {
+                // MATCHUP contains "@" for away games
+                return d.MATCHUP.includes("@") && gameDate >= startDate && gameDate <= endDate;
+            }
             return gameDate >= startDate && gameDate <= endDate;
         });
+
         if (filtered.length === 0) {
             outputDiv.innerText = "No data found for the specified player and season.";
             return;
         }
 
+        const testExpr = teamFilter === "all" ? "true" : `indexof(datum.MATCHUP, '${teamFilter}') !== -1`;
+
         const spec = {
             "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
             "data": { "values": filtered },
             "mark": "bar",
+            "width": 800,
+            "height": 400,
+            "title": {
+                "text": getGraphTitle(),
+                "anchor": "center",
+                "fontSize": 20,
+                "fontWeight": "bold",
+                "dy": -10
+            },
             "encoding": {
                 "x": {
                     "field": "GAME_DATE",
                     "type": "temporal",
                     "title": "Game Date"
                 }, "y": {
-                    "field": "PTS",
+                    "field": selectedStat,
                     "type": "quantitative",
                     "title": "Points",
-                    "axis": { "grid": true }
-                }, "tooltip": [
+                    "axis": { "grid": true, "format": "d" }
+                }, "color": {
+                    "condition": {
+                        "test": testExpr,
+                        "value": "steelblue"
+                    },
+                    "value": "lightgray"
+                },"tooltip": [
                     { "field": "GAME_DATE", "type": "temporal", "title": "Game Date" },
+                    { "field": "MATCHUP", "type": "nominal", "title": "Matchup" },
+                    { "field": "WL", "type": "nominal", "title": "Win/Loss" },
                     { "field": "PTS", "type": "quantitative", "title": "Points" },
                     { "field": "AST", "type": "quantitative", "title": "Assists" },
-                    { "field": "REB", "type": "quantitative", "title": "Rebounds" }
+                    { "field": "REB", "type": "quantitative", "title": "Rebounds" },
+                    { "field": "STL", "type": "quantitative", "title": "Steals" },
+                    { "field": "BLK", "type": "quantitative", "title": "Blocks" }
                 ]
             }
         };
 
+        console.log("Team filter:", teamFilter)
         vegaEmbed("#vis", spec);
         outputDiv.innerText = "";
     } catch (err) {
@@ -158,5 +235,10 @@ async function fetchPlayerStats() {
 window.onload = () => {
     document.getElementById("playerNameInput").value = "LeBron James"; // or any default player
     document.getElementById("seasonDropdown").addEventListener("change", fetchPlayerStats);
+    document.getElementById("statSelection").addEventListener("change", fetchPlayerStats);
+    document.getElementById("locationDropdown").addEventListener("change", fetchPlayerStats);
+    document.getElementById("teamDropdown").addEventListener("change", fetchPlayerStats);
+    document.getElementById("resultDropdown").addEventListener("change", fetchPlayerStats);
+
     handlePlayerInput(); // triggers suggestions + seasons + stats
 }
