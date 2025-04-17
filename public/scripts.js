@@ -254,5 +254,5 @@ window.onload = () => {
     document.getElementById("teamDropdown").addEventListener("change", fetchPlayerStats);
     document.getElementById("resultDropdown").addEventListener("change", fetchPlayerStats);
 
-    handlePlayerInput(); // triggers suggestions + seasons + stats
+    handlePlayerInput();
 }
