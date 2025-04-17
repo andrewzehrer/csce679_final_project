@@ -93,7 +93,7 @@ def player_games():
     df = get_player_game_logs(player_id, season)
 
     # Formats GAME_DATE
-    df["GAME_DATE"] = pd.to_datetime(df["GAME_DATE"])
+    # df["GAME_DATE"] = pd.to_datetime(df["GAME_DATE"])
 
     # Applys filters
     if location == "home":
