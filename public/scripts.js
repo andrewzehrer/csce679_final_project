@@ -270,11 +270,16 @@ async function fetchPlayerStats() {
                     "y": { 
                         "field": selectedStat,
                         "type": "quantitative",
-                        "axis": { 
-                            "grid": true, 
-                            "format": "d",
-                            "orient": "left" 
-                        }
+                        "axis": { "title": selectedStat === "PTS" ? "Points" :
+                                    selectedStat === "AST" ? "Assists" :
+                                    selectedStat === "REB" ? "Rebounds" :
+                                    selectedStat === "STL" ? "Steals" :
+                                    selectedStat === "BLK" ? "Blocks" : "Stat",
+                                     "orient": "left" }
+                                     
+                    },
+                    "scale": { "name": "y1",
+                        //"domain": [0, 50]
                     },
                     "color": {
                         "condition": { 
@@ -310,7 +315,11 @@ async function fetchPlayerStats() {
                     "y": { 
                         "field": `${selectedStat}_avg`, 
                         "type": "quantitative",
-                        "orient": "left"
+                        "scale": { "name": "y" },
+                    "axis": { 
+                        "orient": "left", 
+                        "title": "",
+                        },
                     }
                 }
             });
@@ -333,7 +342,11 @@ async function fetchPlayerStats() {
                     "y": { 
                         "field": "avg", 
                         "type": "quantitative",
-                        "orient": "left" 
+                        "scale": { "name": "y" },
+                        "axis": { 
+                            "orient": "left", 
+                            "title": "",
+                            },
                     }
                 }
             });
@@ -357,9 +370,14 @@ async function fetchPlayerStats() {
                         "field": "stddev", 
                         "type": "quantitative", 
                         "axis": { 
-                            "title": "Standard Deviation", 
-                            "orient": "right" 
-                        } 
+                            "orient": "right", 
+                            "title": "Rolling Std Dev",
+                            "grid": false
+                        },
+                        "scale": { 
+                            "name": "y2",  // <-- Unique scale name
+                            //"domain": [0, 20] 
+                            }
                     },
                 }
             });
@@ -377,25 +395,7 @@ async function fetchPlayerStats() {
             },
             "width": 800,
             "height": 400,
-            "layer": layers,
-            "scales": [
-                {
-                    "name": "y",
-                    "type": "linear",
-                    "domain": { "data": "filtered", "field": selectedStat }
-                },
-                {
-                    "name": "y2",
-                    "type": "linear",
-                    "domain": { "data": "filtered", "field": "stddev" },
-                    "nice": true,
-                    "zero": false
-                }
-            ],
-            "axes": [
-                { "orient": "left", "scale": "y" },
-                { "orient": "right", "scale": "y2"}
-            ]
+            "layer": layers
         };
 
         vegaEmbed("#vis", spec);
