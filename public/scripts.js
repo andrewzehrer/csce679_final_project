@@ -231,10 +231,10 @@ async function fetchPlayerStats() {
         };
 
         const locationExpr = homeAwayFilter === "all"
-        ? "true"
-        : homeAwayFilter === "home"
-            ? `indexof(datum.MATCHUP, 'vs.') !== -1`
-            : `indexof(datum.MATCHUP, '@') !== -1`;
+            ? "true"
+            : homeAwayFilter === "home"
+                ? `indexof(datum.MATCHUP, 'vs.') !== -1`
+                : `indexof(datum.MATCHUP, '@') !== -1`;
 
         const teamExpr = teamFilter === "all"
             ? "true"
@@ -325,7 +325,7 @@ async function fetchPlayerStats() {
                 "mark": { 
                     "type": "line", 
                     "strokeWidth": 2, 
-                    "strokeDash": [4,2] 
+                    "strokeDash": [4,2]
                 },
                 "encoding": {
                     "x": { 
@@ -459,13 +459,30 @@ async function fetchPlayerStats() {
             }
         }
 
-        document.getElementById("gamesPlayed").innerText = gamesPlayed;
+        document.getElementById("tableHeader").innerText = "Games Played: " + gamesPlayed;
         document.getElementById("ptsPerGame").innerText = totals.PTS;
         document.getElementById("astPerGame").innerText = totals.AST;
         document.getElementById("rebPerGame").innerText = totals.REB;
         document.getElementById("stlPerGame").innerText = totals.STL;
         document.getElementById("blkPerGame").innerText = totals.BLK;
 
+        // calculate standard deviation of each stat
+        const stats = ["PTS", "AST", "REB", "STL", "BLK"];
+        const stdDevs = {};
+
+        stats.forEach(stat => {
+            const mean = totals[stat];
+            const variance = filteredForTotals.reduce((acc, d) => {
+                return acc + Math.pow(d[stat] - mean, 2);
+            }, 0) / gamesPlayed;
+            stdDevs[stat] = Math.sqrt(variance).toFixed(2);
+        });
+
+        document.getElementById("ptsStdDev").innerText = stdDevs.PTS;
+        document.getElementById("astStdDev").innerText = stdDevs.AST;
+        document.getElementById("rebStdDev").innerText = stdDevs.REB;
+        document.getElementById("stlStdDev").innerText = stdDevs.STL;
+        document.getElementById("blkStdDev").innerText = stdDevs.BLK;
     } catch (err) {
         console.error("Fetch error:", err);
         document.getElementById("output").innerText = "Error fetching data. Check console.";
