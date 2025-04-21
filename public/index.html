@@ -30,7 +30,7 @@
     </div>
 
     <div id="statSelection" style="margin-top: 20px;">
-        <!-- radio buttons for each stat -->
+        <!-- Radio buttons for each stat -->
         <label><input type="radio" name="stat" value="PTS" checked> Points</label>
         <label><input type="radio" name="stat" value="AST"> Assists</label> 
         <label><input type="radio" name="stat" value="REB"> Rebounds</label>
@@ -39,13 +39,17 @@
     </div>
 
     <div id="filterSelection" style="margin-top: 20px;">
-        <!-- Dropdown for all/home/away -->
+        <strong>Game Filters:</strong>
+
+        <!-- Location filter -->
         <label for="locationDropdown">Location:</label>
         <select id="locationDropdown" style="display: inline;">
             <option value="all">All</option>
             <option value="home">Home</option>
             <option value="away">Away</option>
         </select>
+
+        <!-- Opponent filter -->
         <label for="teamDropdown">Vs:</label>
         <select id="teamDropdown" style="display: inline;">
             <option value="all">All Teams</option>
@@ -82,12 +86,22 @@
             <option>UTA</option>
             <option>WAS</option>
         </select>
+
+        <!-- Result filter -->
         <label for="resultDropdown">Result:</label>
         <select id="resultDropdown" style="display: inline;">
             <option value="all">All</option>
             <option value="W">Wins</option>
             <option value="L">Losses</option>
         </select>
+    </div>
+
+    <div id="displayOptions" style="margin-top: 20px;">
+        <!-- Dipslay options for graph -->
+        <strong>Display Options:</strong>
+        <label><input type="checkbox" id="showSeasonAvg" checked onchange="fetchPlayerStats()"> Show Season Average</label>
+        <label><input type="checkbox" id="showRollingAvg" checked onchange="fetchPlayerStats()"> Show 5-Game Average</label>
+        <label><input type="checkbox" id="showStdDev" checked onchange="fetchPlayerStats()"> Show 5-Game Std. Dev.</label>
     </div>
 
     <div id="vis" style="margin-top: 30px;"></div>
