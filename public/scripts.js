@@ -257,146 +257,153 @@ async function fetchPlayerStats() {
         const testExpr = `${locationExpr} && ${teamExpr} && ${resultExpr}`;
 
         ///////////////////////////////// Chart layers /////////////////////////////////
-        const layers = [
-            { // Bar chart (always shown)
-                "data": { "values": filtered },
-                "mark": "bar",
-                "encoding": {
-                    "x": { 
-                        "field": "GAME_DATE", 
-                        "type": "temporal", 
-                        "title": "Game Date" 
-                    },
-                    "y": { 
-                        "field": selectedStat,
-                        "type": "quantitative",
-                        "axis": { "title": selectedStat === "PTS" ? "Points" :
-                                    selectedStat === "AST" ? "Assists" :
-                                    selectedStat === "REB" ? "Rebounds" :
-                                    selectedStat === "STL" ? "Steals" :
-                                    selectedStat === "BLK" ? "Blocks" : "Stat",
-                                     "orient": "left" }
-                                     
-                    },
-                    "scale": { "name": "y1",
-                        //"domain": [0, 50]
-                    },
-                    "color": {
-                        "condition": { 
-                            "test": testExpr, 
-                            "value": "steelblue" 
-                        },
-                        "value": "lightgray"
-                    },
-                    "tooltip": [
-                        { "field": "GAME_DATE", "type": "temporal", "title": "Game Date" },
-                        { "field": "MATCHUP", "type": "nominal", "title": "Matchup" },
-                        { "field": "WL", "type": "nominal", "title": "Win/Loss" },
-                        { "field": "PTS", "type": "quantitative", "title": "Points" },
-                        { "field": "AST", "type": "quantitative", "title": "Assists" },
-                        { "field": "REB", "type": "quantitative", "title": "Rebounds" },
-                        { "field": "STL", "type": "quantitative", "title": "Steals" },
-                        { "field": "BLK", "type": "quantitative", "title": "Blocks" }
-                    ]
-                }
-            }
-        ];
-        
-        // Add Season Average line
-        if (showSeasonAvg) {
-            layers.push({
-                "data": { "values": runningAverages },
-                "mark": { "type": "line", "color": "green", "strokeWidth": 2 },
-                "encoding": {
-                    "x": { 
-                        "field": "GAME_DATE", 
-                        "type": "temporal" 
-                    },
-                    "y": { 
-                        "field": `${selectedStat}_avg`, 
-                        "type": "quantitative",
-                        "scale": { "name": "y" },
-                    "axis": { 
-                        "orient": "left", 
-                        "title": "",
-                        },
-                    }
-                }
-            });
-        }
-        
-        // Add Rolling 5-game Average line
-        if (showRollingAvg) {
-            layers.push({
-                "data": { "values": rollingStats },
-                "mark": { 
-                    "type": "line", 
-                    "color": "orangered", 
-                    "strokeWidth": 2 
-                },
-                "encoding": {
-                    "x": { 
-                        "field": "GAME_DATE", 
-                        "type": "temporal" 
-                    },
-                    "y": { 
-                        "field": "avg", 
-                        "type": "quantitative",
-                        "scale": { "name": "y" },
-                        "axis": { 
-                            "orient": "left", 
-                            "title": "",
-                            },
-                    }
-                }
-            });
-        }
-        
-        // Add 5-game rolling std deviation line on its own axis on the right
-        if (showStdDev) {
-            layers.push({
-                "data": { "values": rollingStats },
-                "mark": { 
-                    "type": "line", 
-                    "color": "orange", 
-                    "strokeWidth": 2 
-                },
-                "encoding": {
-                    "x": { 
-                        "field": "GAME_DATE", 
-                        "type": "temporal",
-                    },
-                    "y": { 
-                        "field": "stddev", 
-                        "type": "quantitative", 
-                        "axis": { 
-                            "orient": "right", 
-                            "title": "Rolling Std Dev",
-                            "grid": false
-                        },
-                        "scale": { 
-                            "name": "y2",  // <-- Unique scale name
-                            //"domain": [0, 20] 
-                            }
-                    },
-                }
-            });
-        }
+    const activeSeries = [];
+const colors = [];
+if (showSeasonAvg) {
+    activeSeries.push("Season Avg");
+    colors.push("green");
+}
+if (showRollingAvg) {
+    activeSeries.push("5-game Avg");
+    colors.push("orangered");
+}
+if (showStdDev) {
+    activeSeries.push("5-game Std Dev");
+    colors.push("orange");
+}
+const showLegend = activeSeries.length > 0;
 
-        //////////////////////////////// Embed Vega-Lite chart ////////////////////////////////
-        const spec = {
-            "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-            "title": {
-                "text": getGraphTitle(),
-                "anchor": "center",
-                "fontSize": 20,
-                "fontWeight": "bold",
-                "dy": -10
+const layers = [
+    { // Bar chart (always shown)
+        "data": { "values": filtered },
+        "mark": "bar",
+        "encoding": {
+            "x": { 
+                "field": "GAME_DATE", 
+                "type": "temporal", 
+                "title": "Game Date" 
             },
-            "width": 800,
-            "height": 400,
-            "layer": layers
-        };
+            "y": { 
+                "field": selectedStat,
+                "type": "quantitative",
+                "axis": { "title": selectedStat === "PTS" ? "Points" :
+                            selectedStat === "AST" ? "Assists" :
+                            selectedStat === "REB" ? "Rebounds" :
+                            selectedStat === "STL" ? "Steals" :
+                            selectedStat === "BLK" ? "Blocks" : "Stat",
+                                 "orient": "left" }
+            },
+            "scale": { "name": "y"},
+            "color": {
+                "condition": { 
+                    "test": testExpr, 
+                    "value": "steelblue" 
+                },
+                "value": "lightgray"
+            },
+            "tooltip": [
+                { "field": "GAME_DATE", "type": "temporal", "title": "Game Date" },
+                { "field": "MATCHUP", "type": "nominal", "title": "Matchup" },
+                { "field": "WL", "type": "nominal", "title": "Win/Loss" },
+                { "field": "PTS", "type": "quantitative", "title": "Points" },
+                { "field": "AST", "type": "quantitative", "title": "Assists" },
+                { "field": "REB", "type": "quantitative", "title": "Rebounds" },
+                { "field": "STL", "type": "quantitative", "title": "Steals" },
+                { "field": "BLK", "type": "quantitative", "title": "Blocks" }
+            ]
+        }
+    }
+];
+
+// Add Season Average line (if shown)
+if (showSeasonAvg) {
+    layers.push({
+        "data": { 
+            "values": runningAverages.map(d => ({...d, series: "Season Avg"})) 
+        },
+        "mark": { "type": "line", "strokeWidth": 2 },
+        "encoding": {
+            "x": { "field": "GAME_DATE", "type": "temporal" },
+            "y": { 
+                "field": `${selectedStat}_avg`, 
+                "type": "quantitative",
+                "scale": { "name": "y" },
+                "axis": { "orient": "left", "title": "" }
+            },
+            "color": {
+                "field": "series",
+                "type": "nominal",
+                "scale": { "domain": activeSeries, "range": colors },
+                "legend": showLegend ? { "title": "Legend" } : null
+            }
+        }
+    });
+}
+
+// Add Rolling 5-game Average line (if shown)
+if (showRollingAvg) {
+    layers.push({
+        "data": { 
+            "values": rollingStats.map(d => ({...d, series: "5-game Avg"})) 
+        },
+        "mark": { "type": "line", "strokeWidth": 2 },
+        "encoding": {
+            "x": { "field": "GAME_DATE", "type": "temporal" },
+            "y": { 
+                "field": "avg", 
+                "type": "quantitative",
+                "scale": { "name": "y" },
+                "axis": { "orient": "left", "title": "" }
+            },
+            "color": {
+                "field": "series",
+                "type": "nominal",
+                "scale": { "domain": activeSeries, "range": colors },
+                "legend": showLegend ? { "title": "Legend" } : null
+            }
+        }
+    });
+}
+
+// Add Std Dev line (if shown)
+if (showStdDev) {
+    layers.push({
+        "data": { 
+            "values": rollingStats.map(d => ({...d, series: "5-game Std Dev"})) 
+        },
+        "mark": { "type": "line", "strokeWidth": 2 },
+        "encoding": {
+            "x": { "field": "GAME_DATE", "type": "temporal" },
+            "y": { 
+                "field": "stddev", 
+                "type": "quantitative", 
+                "scale": { "name": "y" },
+                "axis": { "orient": "right", "title": "Rolling Std Dev", "grid": false }
+            },
+            "color": {
+                "field": "series",
+                "type": "nominal",
+                "scale": { "domain": activeSeries, "range": colors },
+                "legend": showLegend ? { "title": "Legend" } : null
+            }
+        }
+    });
+}
+
+const spec = {
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    "title": {
+        "text": getGraphTitle(),
+        "anchor": "center",
+        "fontSize": 20,
+        "fontWeight": "bold",
+        "dy": -10
+    },
+    "width": 800,
+    "height": 400,
+    "layer": layers
+};
+        
 
         vegaEmbed("#vis", spec);
         outputDiv.innerText = "";
