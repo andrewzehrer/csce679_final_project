@@ -425,8 +425,14 @@ async function fetchPlayerStats() {
                 "fontWeight": "bold",
                 "dy": -10
             },
-            "width": 800,
-            "height": 400,
+            "autosize": { 
+                "type": "fit",
+                "resize": true,
+                "contains": "padding"
+            },
+            "padding": 20,
+            "width": "container",
+            "height": "container",
             "layer": layers
         };
 
@@ -444,8 +450,14 @@ async function fetchPlayerStats() {
                 "fontWeight": "bold",
                 "dy": -10
             },
-            "width": 800,
-            "height": 200,
+            "autosize": { 
+                "type": "fit",
+                "resize": true,
+                "contains": "padding"
+            },
+            "padding": 20,
+            "width": "container",
+            "height": "container",
             "data": { "values": boxPlotData },
             "mark": {
                 "type": "boxplot",

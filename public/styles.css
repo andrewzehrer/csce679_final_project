@@ -1,6 +1,5 @@
 body {
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    background-color: #f4f4f4;
     text-align: center;
     padding: 20px;
     background-image: url("https://wallpaperaccess.com/full/3694273.jpg");
@@ -10,26 +9,59 @@ body {
     background-blend-mode: darken;
 }
 
-#superDiv {
-    
-}
-
 div {
     margin: 0 auto;
     padding: 20px;
     background-color: rgba(255, 255, 255, 0.90);
     border-radius: 10px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    width: 90%vw;
-    max-width: 1044px;
 }
 
-#vis {
-    width: 100%;
+.flex-container {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    height: 90vh;
+    width: 95vw;
+    gap: 1rem;
+    overflow-y: auto;
+    box-sizing: border-box;
+    padding: 1rem;
+    background-color: rgba(216, 216, 216, 0.75);
 }
 
-#boxPlot {
+.flex-item {
+    flex: 0 0 auto;
+    padding: 1rem;
+    border-radius: 8px;
+    box-sizing: border-box;
     width: 100%;
+    overflow: auto;
+}
+
+@media (min-width: 800px) {
+    .flex-item {
+        width: calc(50% - 0.5rem);
+    }
+}
+
+.chart-wrapper {
+    width: 100%;
+    max-width: 800px; 
+    overflow: hidden;
+    position: relative;
+    padding: 0px;
+    aspect-ratio: 16 / 9;
+}
+  
+.vega-embed {
+    display: block;
+    height: auto;
+}
+
+.vega-embed canvas {
+    display: block;
+    object-fit: contain;
 }
 
 #totalsTable {
@@ -40,7 +72,6 @@ div {
     overflow: hidden;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     background-color: #fff;
-    margin-bottom: 20px;
     border-collapse: collapse;
 }
 

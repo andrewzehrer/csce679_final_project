@@ -11,140 +11,142 @@
     <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
 </head>
 <body>
-    <div id="header">
-        <h2>NBA Stat Viz</h2>
-        <h3>A tool to visualize NBA player performance, consistency, and more</h3>
-        <h4>Developed by Steve Wang, Andrew Zehrer, Kai Zhao</h4>
+    <div class="flex-container">
+        <div id="header" class="flex-item">
+            <h2>NBA Stat Viz</h2>
+            <h3>A tool to visualize NBA player performance, consistency, and more</h3>
+            <h4>Developed by Steve Wang, Andrew Zehrer, Kai Zhao</h4>
+        </div>
+    
+        <div id="inputDiv" class="flex-item">
+            <strong>Player Name:</strong>
+            <input 
+                type="text" 
+                id="playerNameInput" 
+                placeholder="Enter player name" 
+                list="playerSuggestions" 
+                oninput="handlePlayerInput()"></input>
+            <datalist id="playerSuggestions"></datalist>
+            <select id="seasonDropdown" style="display: inline;" value="2024-25"></select>
+    
+            <br><br>
+    
+            <strong>Select a Stat:</strong>
+            <label><input type="radio" name="stat" value="PTS" checked> Points</label>
+            <label><input type="radio" name="stat" value="AST"> Assists</label> 
+            <label><input type="radio" name="stat" value="REB"> Rebounds</label>
+            <label><input type="radio" name="stat" value="STL"> Steals</label>
+            <label><input type="radio" name="stat" value="BLK"> Blocks</label>
+    
+            <br><br>
+    
+            <strong>Game Filters:</strong>
+    
+            <!-- Location filter -->
+            <label for="locationDropdown">Location:</label>
+            <select id="locationDropdown" style="display: inline;">
+                <option value="all">All</option>
+                <option value="home">Home</option>
+                <option value="away">Away</option>
+            </select>
+    
+            <!-- Opponent filter -->
+            <label for="teamDropdown">Vs:</label>
+            <select id="teamDropdown" style="display: inline;">
+                <option value="all">All Teams</option>
+                <!-- <option>Eastern</option> -->
+                <!-- <option>Western</option> -->
+                <option>ATL</option>
+                <option>BKN</option>
+                <option>BOS</option>
+                <option>CHA</option>
+                <option>CHI</option>
+                <option>CLE</option>
+                <option>DAL</option>
+                <option>DEN</option>
+                <option>DET</option>
+                <option>GSW</option>
+                <option>HOU</option>
+                <option>IND</option>
+                <option>LAC</option>
+                <option>LAL</option>
+                <option>MEM</option>
+                <option>MIA</option>
+                <option>MIL</option>
+                <option>MIN</option>
+                <option>NOP</option>
+                <option>NYK</option>
+                <option>OKC</option>
+                <option>ORL</option>
+                <option>PHI</option>
+                <option>PHX</option>
+                <option>POR</option>
+                <option>SAC</option>
+                <option>SAS</option>
+                <option>TOR</option>
+                <option>UTA</option>
+                <option>WAS</option>
+            </select>
+    
+            <!-- Result filter -->
+            <label for="resultDropdown">Result:</label>
+            <select id="resultDropdown" style="display: inline;">
+                <option value="all">All</option>
+                <option value="W">Wins</option>
+                <option value="L">Losses</option>
+            </select>
+    
+            <br><br>
+    
+            <!-- Dipslay options for graph -->
+            <strong>Display Options:</strong>
+            <label><input type="checkbox" id="showSeasonAvg" checked onchange="fetchPlayerStats()"> Show Season Average</label>
+            <label><input type="checkbox" id="showRollingAvg" checked onchange="fetchPlayerStats()"> Show 5-Game Average</label>
+        </div>
+    
+        <div id="vis" class="flex-item"></div>
+
+        <div id="boxPlot" class="flex-item"></div>
+
+        <div id="totals" class="flex-item">
+            <table id="totalsTable">
+                <thead>
+                    <tr>
+                        <th id="tableHeader" colspan="6">Total Games: </th>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <th>Points</th>
+                        <th>Assists</th>
+                        <th>Rebounds</th>
+                        <th>Steals</th>
+                        <th>Blocks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th>Average</th>
+                        <td id="ptsPerGame"></td>
+                        <td id="astPerGame"></td>
+                        <td id="rebPerGame"></td>
+                        <td id="stlPerGame"></td>
+                        <td id="blkPerGame"></td>
+                    </tr>
+                    <tr>
+                        <th>Std. Dev.</th>
+                        <td id="ptsStdDev"></td>
+                        <td id="astStdDev"></td>
+                        <td id="rebStdDev"></td>
+                        <td id="stlStdDev"></td>
+                        <td id="blkStdDev"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="output" class="flex-item" style="visibility: hidden;"></div>
     </div>
-
-    <div id="inputDiv" style="margin-top: 20px;">
-        <!-- Input field with auto-suggestions -->
-        <strong>Player Name:</strong>
-        <input 
-            type="text" 
-            id="playerNameInput" 
-            placeholder="Enter player name" 
-            list="playerSuggestions" 
-            oninput="handlePlayerInput()"></input>
-        <!-- Datalist for auto-suggestions -->
-        <datalist id="playerSuggestions"></datalist>
-        <!-- Season Dropdown -->
-        <select id="seasonDropdown" style="display: inline;" value="2024-25"></select>
-
-        <br><br>
-
-        <strong>Select a Stat:</strong>
-        <!-- Radio buttons for each stat -->
-        <label><input type="radio" name="stat" value="PTS" checked> Points</label>
-        <label><input type="radio" name="stat" value="AST"> Assists</label> 
-        <label><input type="radio" name="stat" value="REB"> Rebounds</label>
-        <label><input type="radio" name="stat" value="STL"> Steals</label>
-        <label><input type="radio" name="stat" value="BLK"> Blocks</label>
-
-        <br><br>
-
-        <strong>Game Filters:</strong>
-
-        <!-- Location filter -->
-        <label for="locationDropdown">Location:</label>
-        <select id="locationDropdown" style="display: inline;">
-            <option value="all">All</option>
-            <option value="home">Home</option>
-            <option value="away">Away</option>
-        </select>
-
-        <!-- Opponent filter -->
-        <label for="teamDropdown">Vs:</label>
-        <select id="teamDropdown" style="display: inline;">
-            <option value="all">All Teams</option>
-            <!-- <option>Eastern</option> -->
-            <!-- <option>Western</option> -->
-            <option>ATL</option>
-            <option>BKN</option>
-            <option>BOS</option>
-            <option>CHA</option>
-            <option>CHI</option>
-            <option>CLE</option>
-            <option>DAL</option>
-            <option>DEN</option>
-            <option>DET</option>
-            <option>GSW</option>
-            <option>HOU</option>
-            <option>IND</option>
-            <option>LAC</option>
-            <option>LAL</option>
-            <option>MEM</option>
-            <option>MIA</option>
-            <option>MIL</option>
-            <option>MIN</option>
-            <option>NOP</option>
-            <option>NYK</option>
-            <option>OKC</option>
-            <option>ORL</option>
-            <option>PHI</option>
-            <option>PHX</option>
-            <option>POR</option>
-            <option>SAC</option>
-            <option>SAS</option>
-            <option>TOR</option>
-            <option>UTA</option>
-            <option>WAS</option>
-        </select>
-
-        <!-- Result filter -->
-        <label for="resultDropdown">Result:</label>
-        <select id="resultDropdown" style="display: inline;">
-            <option value="all">All</option>
-            <option value="W">Wins</option>
-            <option value="L">Losses</option>
-        </select>
-
-        <br><br>
-
-        <!-- Dipslay options for graph -->
-        <strong>Display Options:</strong>
-        <label><input type="checkbox" id="showSeasonAvg" checked onchange="fetchPlayerStats()"> Show Season Average</label>
-        <label><input type="checkbox" id="showRollingAvg" checked onchange="fetchPlayerStats()"> Show 5-Game Average</label>
-    </div>
-
-    <div id="vis" style="margin-top: 30px;"></div>
-    <div id="boxPlot" style="margin-top: 20px;"></div>
-    <div id="totals" style="margin-top: 20px;">
-        <table id="totalsTable">
-            <thead>
-                <tr>
-                    <th id="tableHeader" colspan="6">Total Games: </th>
-                </tr>
-                <tr>
-                    <th></th>
-                    <th>Points</th>
-                    <th>Assists</th>
-                    <th>Rebounds</th>
-                    <th>Steals</th>
-                    <th>Blocks</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <th>Average</th>
-                    <td id="ptsPerGame"></td>
-                    <td id="astPerGame"></td>
-                    <td id="rebPerGame"></td>
-                    <td id="stlPerGame"></td>
-                    <td id="blkPerGame"></td>
-                </tr>
-                <tr>
-                    <th>Std. Dev.</th>
-                    <td id="ptsStdDev"></td>
-                    <td id="astStdDev"></td>
-                    <td id="rebStdDev"></td>
-                    <td id="stlStdDev"></td>
-                    <td id="blkStdDev"></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    <div id="output" style="margin-top: 20px; visibility: hidden;"></div>
+    
 
 </body>
 </html>
