@@ -1,5 +1,13 @@
 let inputTimeout;
 
+const statText = {
+    "PTS": "Points",
+    "AST": "Assists",
+    "REB": "Rebounds",
+    "STL": "Steals",
+    "BLK": "Blocks"
+};
+
 function getGraphTitle() {
     const playerName = document.getElementById("playerNameInput").value;
     const seasonYear = document.getElementById("seasonDropdown").value.slice(0, 4);
@@ -8,14 +16,6 @@ function getGraphTitle() {
     const homeAwayFilter = document.getElementById("locationDropdown").value;
     const teamFilter = document.getElementById("teamDropdown").value;
     const winLossFilter = document.getElementById("resultDropdown").value;
-
-    const statText = {
-        "PTS": "Points",
-        "AST": "Assists",
-        "REB": "Rebounds",
-        "STL": "Steals",
-        "BLK": "Blocks"
-    };
 
     const parts = [
         `${playerName}`,
@@ -282,11 +282,7 @@ async function fetchPlayerStats() {
                         "field": selectedStat,
                         "type": "quantitative",
                         "axis": { 
-                            "title": selectedStat === "PTS" ? "Points" :
-                                    selectedStat === "AST" ? "Assists" :
-                                    selectedStat === "REB" ? "Rebounds" :
-                                    selectedStat === "STL" ? "Steals" :
-                                    selectedStat === "BLK" ? "Blocks" : "",
+                            "title": statText[selectedStat],
                             "orient": "left"
                         }
                     },
@@ -441,13 +437,13 @@ async function fetchPlayerStats() {
         const boxPlotData = filtered.map(d => ({ [selectedStat]: d[selectedStat] }));
         const boxPlotSpec = {
             "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-            // "title": {
-            //     // "text": `Box Plot of ${selectedStat} for ${playerName} (${seasonYear})`,
-            //     "anchor": "center",
-            //     "fontSize": 20,
-            //     "fontWeight": "bold",
-            //     "dy": -10
-            // },
+            "title": {
+                "text": `${playerName} - ${seasonYear}-${(parseInt(seasonYear) + 1).toString().slice(-2)} ${statText[selectedStat]} Box Plot`,
+                "anchor": "center",
+                "fontSize": 20,
+                "fontWeight": "bold",
+                "dy": -10
+            },
             "width": 800,
             "height": 200,
             "data": { "values": boxPlotData },
@@ -462,15 +458,15 @@ async function fetchPlayerStats() {
                 "x": { 
                     "field": selectedStat, 
                     "type": "quantitative", 
-                    "title": selectedStat === "PTS" ? "Points" :
-                                    selectedStat === "AST" ? "Assists" :
-                                    selectedStat === "REB" ? "Rebounds" :
-                                    selectedStat === "STL" ? "Steals" :
-                                    selectedStat === "BLK" ? "Blocks" : "" 
+                    "title": statText[selectedStat]
                 },
                 "color": { "value": "steelblue" },
                 "tooltip": [
-                    { "field": selectedStat, "type": "quantitative", "title": selectedStat }
+                    { 
+                        "field": selectedStat, 
+                        "type": "quantitative", 
+                        "title": selectedStat 
+                    }
                 ]
             }
         };
@@ -542,12 +538,8 @@ async function fetchPlayerStats() {
 }
 
 window.onload = () => {
-    // document.getElementById("playerNameInput").value = "LeBron James"; // or any default player
-    // document.getElementById("seasonDropdown").addEventListener("change", fetchPlayerStats);
     document.getElementById("inputDiv").addEventListener("change", fetchPlayerStats);
-    // document.getElementById("locationDropdown").addEventListener("change", fetchPlayerStats);
-    // document.getElementById("teamDropdown").addEventListener("change", fetchPlayerStats);
-    // document.getElementById("resultDropdown").addEventListener("change", fetchPlayerStats);
+
 
     handlePlayerInput();
 }
