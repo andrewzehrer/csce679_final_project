@@ -1,19 +1,29 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     background-color: #f4f4f4;
     text-align: center;
-    padding: 20px;    
+    padding: 20px;
+    background-image: url("https://wallpaperaccess.com/full/3694273.jpg");
+    background-size: stretch;
+    background-position: center;
+    background-color: rgba(0,0,0,0.2); /* dark overlay */
+    background-blend-mode: darken;
+}
+
+#superDiv {
+    
+}
+
+div {
+    margin: 0 auto;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.90);
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 #vis {
-    width: 80%;
-    height: auto;
-    margin: 20px auto;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background-color: #fff;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    padding: 4px;
+    
 }
 
 #totalsTable {

@@ -272,7 +272,11 @@ async function fetchPlayerStats() {
                     "x": { 
                         "field": "GAME_DATE", 
                         "type": "temporal", 
-                        "title": "Game Date" 
+                        "title": "Game Date",
+                        "axis": { 
+                            "labelAngle": -45, 
+                            "orient": "bottom" 
+                        }
                     },
                     "y": { 
                         "field": selectedStat,
@@ -433,6 +437,51 @@ async function fetchPlayerStats() {
         vegaEmbed("#vis", spec);
         outputDiv.innerText = "";
 
+        //////////////////////////////// Generate box plot ////////////////////////////////
+        const boxPlotData = filtered.map(d => ({ [selectedStat]: d[selectedStat] }));
+        const boxPlotSpec = {
+            "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+            // "title": {
+            //     // "text": `Box Plot of ${selectedStat} for ${playerName} (${seasonYear})`,
+            //     "anchor": "center",
+            //     "fontSize": 20,
+            //     "fontWeight": "bold",
+            //     "dy": -10
+            // },
+            "width": 800,
+            "height": 200,
+            "data": { "values": boxPlotData },
+            "mark": {
+                "type": "boxplot",
+                "extent": 1.5,
+                "outliers": true,
+                "size": 50,
+                "ticks": true
+            },
+            "encoding": {
+                "x": { 
+                    "field": selectedStat, 
+                    "type": "quantitative", 
+                    "title": selectedStat === "PTS" ? "Points" :
+                                    selectedStat === "AST" ? "Assists" :
+                                    selectedStat === "REB" ? "Rebounds" :
+                                    selectedStat === "STL" ? "Steals" :
+                                    selectedStat === "BLK" ? "Blocks" : "" 
+                },
+                "color": { "value": "steelblue" },
+                "tooltip": [
+                    { "field": selectedStat, "type": "quantitative", "title": selectedStat }
+                ]
+            }
+        };
+
+        vegaEmbed("#boxPlot", boxPlotSpec).then(() => {
+            document.getElementById("boxPlot").style.display = "block";
+        }).catch(err => {
+            console.error("Error rendering box plot:", err);
+            document.getElementById("boxPlot").style.display = "none";
+        });
+
         ///////////////////////////////// Display table totals ////////////////////////////////
         const filteredForTotals = filtered.filter(passesFilters);
 
@@ -483,19 +532,22 @@ async function fetchPlayerStats() {
         document.getElementById("rebStdDev").innerText = stdDevs.REB;
         document.getElementById("stlStdDev").innerText = stdDevs.STL;
         document.getElementById("blkStdDev").innerText = stdDevs.BLK;
+
+        document.getElementById("output").style.display = "none";
     } catch (err) {
         console.error("Fetch error:", err);
         document.getElementById("output").innerText = "Error fetching data. Check console.";
+        document.getElementById("output").style.display = "flex";
     }
 }
 
 window.onload = () => {
     // document.getElementById("playerNameInput").value = "LeBron James"; // or any default player
-    document.getElementById("seasonDropdown").addEventListener("change", fetchPlayerStats);
-    document.getElementById("statSelection").addEventListener("change", fetchPlayerStats);
-    document.getElementById("locationDropdown").addEventListener("change", fetchPlayerStats);
-    document.getElementById("teamDropdown").addEventListener("change", fetchPlayerStats);
-    document.getElementById("resultDropdown").addEventListener("change", fetchPlayerStats);
+    // document.getElementById("seasonDropdown").addEventListener("change", fetchPlayerStats);
+    document.getElementById("inputDiv").addEventListener("change", fetchPlayerStats);
+    // document.getElementById("locationDropdown").addEventListener("change", fetchPlayerStats);
+    // document.getElementById("teamDropdown").addEventListener("change", fetchPlayerStats);
+    // document.getElementById("resultDropdown").addEventListener("change", fetchPlayerStats);
 
     handlePlayerInput();
 }

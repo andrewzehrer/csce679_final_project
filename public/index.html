@@ -11,34 +11,38 @@
     <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
 </head>
 <body>
-    <h2>NBA Player Game Log</h2>
+    <div id="header">
+        <h2>NBA Stat Viz</h2>
+        <h3>A tool to visualize NBA player performance, consistency, and more</h3>
+        <h4>Developed by Steve Wang, Andrew Zehrer, Kai Zhao</h4>
+    </div>
 
-    <div id="inputs">
+    <div id="inputDiv" style="margin-top: 20px;">
         <!-- Input field with auto-suggestions -->
+        <strong>Player Name:</strong>
         <input 
             type="text" 
             id="playerNameInput" 
             placeholder="Enter player name" 
             list="playerSuggestions" 
-            oninput="handlePlayerInput()"
-        />
+            oninput="handlePlayerInput()"></input>
         <!-- Datalist for auto-suggestions -->
         <datalist id="playerSuggestions"></datalist>
-
         <!-- Season Dropdown -->
         <select id="seasonDropdown" style="display: inline;" value="2024-25"></select>
-    </div>
 
-    <div id="statSelection" style="margin-top: 20px;">
+        <br><br>
+
+        <strong>Select a Stat:</strong>
         <!-- Radio buttons for each stat -->
         <label><input type="radio" name="stat" value="PTS" checked> Points</label>
         <label><input type="radio" name="stat" value="AST"> Assists</label> 
         <label><input type="radio" name="stat" value="REB"> Rebounds</label>
         <label><input type="radio" name="stat" value="STL"> Steals</label>
         <label><input type="radio" name="stat" value="BLK"> Blocks</label>
-    </div>
 
-    <div id="filterSelection" style="margin-top: 20px;">
+        <br><br>
+
         <strong>Game Filters:</strong>
 
         <!-- Location filter -->
@@ -94,9 +98,9 @@
             <option value="W">Wins</option>
             <option value="L">Losses</option>
         </select>
-    </div>
 
-    <div id="displayOptions" style="margin-top: 20px;">
+        <br><br>
+
         <!-- Dipslay options for graph -->
         <strong>Display Options:</strong>
         <label><input type="checkbox" id="showSeasonAvg" checked onchange="fetchPlayerStats()"> Show Season Average</label>
@@ -104,7 +108,7 @@
     </div>
 
     <div id="vis" style="margin-top: 30px;"></div>
-    <div id="boxplot" style="margin-top: 20px;"></div>
+    <div id="boxPlot" style="margin-top: 20px;"></div>
     <div id="totals" style="margin-top: 20px;">
         <table id="totalsTable">
             <thead>
@@ -140,7 +144,7 @@
             </tbody>
         </table>
     </div>
-    <div id="output" style="margin-top: 20px;"></div>
+    <div id="output" style="margin-top: 20px; visibility: hidden;"></div>
 
 </body>
 </html>
