@@ -262,7 +262,7 @@ async function updateGraph(data_filtered) {
                     "axis": { 
                         "labelAngle": -45, 
                         "orient": "bottom",
-                        "format": "%b"
+                        "format": "%b %e"
                     }
                 },
                 "y": { 
@@ -453,52 +453,6 @@ async function updateGraph(data_filtered) {
     vegaEmbed("#vis", spec);
     // outputDiv.innerText = "";
 
-    //////////////////////////////// Generate box plot ////////////////////////////////
-    const boxPlotData = data_filtered.map(d => ({ [selectedStat]: d[selectedStat] }));
-    const boxPlotSpec = {
-        "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-        "title": {
-            "text": `${playerName} - ${seasonYear}-${(parseInt(seasonYear) + 1).toString().slice(-2)} ${statText[selectedStat]} Box Plot`,
-            "anchor": "center",
-            "fontSize": 20,
-            "fontWeight": "bold",
-            "dy": -10
-        },
-        "autosize": { 
-            "type": "fit",
-            "resize": true,
-            "contains": "padding"
-        },
-        "padding": 20,
-        "width": "container",
-        "height": "container",
-        "data": { "values": boxPlotData },
-        "mark": {
-            "type": "boxplot",
-            "extent": 1.5,
-            "outliers": true,
-            "size": 50,
-            "ticks": true
-        },
-        "encoding": {
-            "x": { 
-                "field": selectedStat, 
-                "type": "quantitative", 
-                "title": statText[selectedStat]
-            },
-            "color": { "value": "steelblue" },
-            "tooltip": [
-                { 
-                    "field": selectedStat, 
-                    "type": "quantitative", 
-                    "title": selectedStat 
-                }
-            ]
-        }
-    };
-
-    vegaEmbed("#boxPlot", boxPlotSpec);
-
     ///////////////////////////////// Display table totals ////////////////////////////////
     const filteredForTotals = data_filtered.filter(passesFilters);
     const totals = { 
@@ -554,6 +508,115 @@ async function updateGraph(data_filtered) {
     document.getElementById("rebStdDev").innerText = stdDevs.REB;
     document.getElementById("stlStdDev").innerText = stdDevs.STL;
     document.getElementById("blkStdDev").innerText = stdDevs.BLK;
+
+    //////////////////////////////// Generate box plot ////////////////////////////////
+    const boxPlotData = data_filtered.map(d => ({ [selectedStat]: d[selectedStat] }));
+    const boxPlotSpec = {
+        "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+        "title": {
+            "text": `${playerName} - ${seasonYear}-${(parseInt(seasonYear) + 1).toString().slice(-2)} ${statText[selectedStat]} Box Plot`,
+            "anchor": "center",
+            "fontSize": 20,
+            "fontWeight": "bold",
+            "dy": -10
+        },
+        "autosize": { 
+            "type": "fit",
+            "resize": true,
+            "contains": "padding"
+        },
+        "padding": 20,
+        "width": "container",
+        "height": "container",
+        "data": { "values": boxPlotData },
+        "mark": {
+            "type": "boxplot",
+            "extent": 1.5,
+            "outliers": true,
+            "size": 50,
+            "ticks": true
+        },
+        "encoding": {
+            "x": { 
+                "field": selectedStat, 
+                "type": "quantitative", 
+                "title": statText[selectedStat],
+                "axis": {
+                    "format": "d"
+                }
+            },
+            "color": { "value": "steelblue" },
+            "tooltip": [
+                { 
+                    "field": selectedStat, 
+                    "type": "quantitative", 
+                    "title": selectedStat 
+                }
+            ]
+        }
+    };
+
+    vegaEmbed("#boxPlot", boxPlotSpec);
+
+    //////////////////////////////// Generate histogram ////////////////////////////////
+    const histogramData = data_filtered.map(d => ({ [selectedStat]: d[selectedStat] }));
+    histogramData.sort((a, b) => a[selectedStat] - b[selectedStat]);
+    
+    const histogramSpec = {
+        "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+        "title": {
+            "text": `${playerName} - ${seasonYear}-${(parseInt(seasonYear) + 1).toString().slice(-2)} ${statText[selectedStat]} Histogram`,
+            "anchor": "center",
+            "fontSize": 20,
+            "fontWeight": "bold",
+            "dy": -10
+        },
+        "autosize": { 
+            "type": "fit",
+            "resize": true,
+            "contains": "padding"
+        },
+        "padding": 20,
+        "width": "container",
+        "height": "container",
+        "data": { "values": histogramData },
+        "mark": {
+            "type": "bar",
+            "tooltip": true,
+        },
+        "encoding": {
+            "x": { 
+                "field": selectedStat, 
+                "type": "quantitative", 
+                "bin": { "step": 5 }, 
+                "title": statText[selectedStat],
+                "axis": {
+                    "format": "d"
+                }
+            },
+            "y": { 
+                "aggregate": 'count', 
+                "type": 'quantitative', 
+                "title": 'Count' 
+            },
+            "color": { "value": "steelblue" },
+            "tooltip": [
+                {
+                    "field": selectedStat,
+                    "bin": { "step": 5 },
+                    "type": "quantitative",
+                    "title": selectedStat
+                },
+                {
+                    "aggregate": "count",
+                    "type": "quantitative",
+                    "title": "Count"
+                }
+            ]
+        }
+    };
+
+    vegaEmbed("#histogram", histogramSpec);
 }
 
 window.onload = () => {
@@ -562,7 +625,7 @@ window.onload = () => {
     document.getElementById("playerNameInput").addEventListener("input", () => {
         handlePlayerInput();
     });
-    
+
     document.getElementById("seasonDropdown").addEventListener("change", () => {
         fetchPlayerStats();
     });
