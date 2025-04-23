@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from nba_api.stats.static import players
-from nba_api.stats.endpoints import playercareerstats, playergamelog
+from nba_api.stats.endpoints import playercareerstats, playergamelog, commonplayerinfo
 import numpy as np
 import pandas as pd
 
@@ -70,6 +70,42 @@ def player_suggestions():
     ]
     return jsonify((active_players + retired_players)[:10])
 
+# ------------------------ PLAYER BIO ------------------------
+def get_player_bio(name):
+    from nba_api.stats.static import players
+    player = players.find_players_by_full_name(name)[0]
+    player_id = player["id"]
+    
+    info = commonplayerinfo.CommonPlayerInfo(player_id)
+    bio_data = info.get_normalized_dict()["CommonPlayerInfo"][0]  # this returns a dict directly
+
+    portrait_url = f"https://cdn.nba.com/headshots/nba/latest/1040x760/{player_id}.png"
+    team_id = bio_data["TEAM_ID"]
+    team_logo_url = f"https://cdn.nba.com/logos/nba/{team_id}/global/L/logo.svg"
+
+    return {
+        "name": bio_data["DISPLAY_FIRST_LAST"],
+        "team": bio_data["TEAM_NAME"],
+        "team_abbr": bio_data["TEAM_ABBREVIATION"],
+        "birthdate": bio_data["BIRTHDATE"],
+        "height": bio_data["HEIGHT"],
+        "weight": bio_data["WEIGHT"],
+        "school": bio_data["SCHOOL"],
+        "experience": bio_data["SEASON_EXP"],
+        "portrait_url": portrait_url,
+        "team_logo_url": team_logo_url
+    }
+
+@app.route("/player-bio")
+def player_bio():
+    name = request.args.get("name")
+    if not name:
+        return jsonify({"error": "Missing player name"}), 400
+    try:
+        return jsonify(get_player_bio(name))
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 # ------------------------ GAME LOGS + FILTERS ------------------------
 
 def get_player_game_logs(player_id, season='2024'):
@@ -83,7 +119,7 @@ def player_games():
     season = request.args.get("season", "2024")
     location = request.args.get("location")
     opponent = request.args.get("vs")
-    include_consistency = request.args.get("include_consistency", "false").lower() == "true"
+    # include_consistency = request.args.get("include_consistency", "false").lower() == "true"
 
     match = players.find_players_by_full_name(name)
     if not match:
@@ -108,10 +144,10 @@ def player_games():
     filtered = filtered.sort_values("GAME_DATE")
 
     # Adds consistency fields
-    if include_consistency:
-        for stat in ["PTS", "AST", "REB"]:
-            filtered[f"{stat}_ROLLING_AVG"] = filtered[stat].rolling(5).mean().round(2)
-            filtered[f"{stat}_ROLLING_STD"] = filtered[stat].rolling(5).std().round(2)
+    # if include_consistency:
+    #     for stat in ["PTS", "AST", "REB"]:
+    #         filtered[f"{stat}_ROLLING_AVG"] = filtered[stat].rolling(5).mean().round(2)
+    #         filtered[f"{stat}_ROLLING_STD"] = filtered[stat].rolling(5).std().round(2)
 
     # Cleans NaN → null for frontend
     filtered = filtered.replace({np.nan: None})

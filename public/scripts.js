@@ -43,6 +43,7 @@ function getSelectedStat() {
 function handlePlayerInput() {
     clearTimeout(inputTimeout);
     fetchPlayerSuggestions();
+    loadPlayerBio();
 
     inputTimeout = setTimeout(() => {
         loadSeasons();
@@ -119,7 +120,53 @@ async function loadSeasons() {
     }
 }
 
-////////////////////////////// Main function to fetch player stats ////////////////////////////////
+// Load player bio information
+async function loadPlayerBio() {
+    const playerName = document.getElementById("playerNameInput").value;
+    const bioDiv = document.getElementById("bio");
+
+    if (!playerName.trim()) return;
+    
+    try {
+        const res = await fetch(`http://localhost:5000/player-bio?name=${encodeURIComponent(playerName)}`);
+        const bio = await res.json();
+
+        if (res.status !== 200 || !bio) {
+            bioDiv.innerHTML = "No data found.";
+            return;
+        }
+
+        document.getElementById("player-portrait").src = bio.portrait_url;
+        document.getElementById("bio").style.backgroundImage = `url('${bio.team_logo_url}')`;
+
+        document.getElementById("player-name").textContent = bio.name;
+        document.getElementById("player-team").textContent = bio.team;
+
+        // have to caluclate age from birthdate
+        const birthdate = new Date(bio.birthdate);
+        const today = new Date();
+        const age = today.getFullYear() - birthdate.getFullYear();
+
+        // chop off the time part of the date
+        const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+        const birthdateString = birthdate.toLocaleDateString('en-US', options);
+        const birthdateParts = birthdateString.split('/');
+        const formattedBirthdate = `${birthdateParts[0]}/${birthdateParts[1]}/${birthdateParts[2]}`;
+
+        document.getElementById("player-birthdate").textContent = `${formattedBirthdate} (Age ${age})`;
+
+        document.getElementById("player-height").textContent = bio.height;
+        document.getElementById("player-weight").textContent = bio.weight;
+        document.getElementById("player-school").textContent = bio.school;
+        document.getElementById("player-exp").textContent = bio.experience;
+        
+    } catch (err) {
+        console.error("Error fetching player bio:", err);
+        bioDiv.innerHTML = "Error loading player bio.";
+    }
+}
+
+////////////////////////////// Main function to fetch player stats //////////////////////////////
 async function fetchPlayerStats() {
     //////////////////////////////// Get input values ////////////////////////////////
     const playerName = document.getElementById("playerNameInput").value;
@@ -180,9 +227,11 @@ async function fetchPlayerStats() {
         // document.getElementById("output").style.display = "flex";
     }
 
+    // loadPlayerBio();
     updateGraph(data_filtered); 
 }
 
+//////////////////////////// Update graph and table totals without fetching ////////////////////////////
 async function updateGraph(data_filtered) {
     const playerName = document.getElementById("playerNameInput").value;
     const seasonYear = document.getElementById("seasonDropdown").value.slice(0, 4);

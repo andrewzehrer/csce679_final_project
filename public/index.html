@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NBA Player Game Log</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="./scripts.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
@@ -104,8 +103,22 @@
             <label><input type="checkbox" id="showRollingAvg" checked onchange="fetchPlayerStats()"> Show 5-Game Average</label>
         </div>
 
+        <!-- Player bio div -->
         <div id="bio" class="flex-item">
-            <p>Bio information goes here</p>
+            <div class="bio-info" id="bio-info">
+                <div class="portrait-box">
+                    <img id="player-portrait" src="" alt="Player Portrait"></img>
+                </div>
+                <div id="bio-info-text">
+                    <h2 id="player-name"></h2>
+                    <p><strong>Team:</strong> <span id="player-team"></span></p>
+                    <p><strong>Birthdate:</strong> <span id="player-birthdate"></span></p>
+                    <p><strong>Height:</strong> <span id="player-height"></span></p>
+                    <p><strong>Weight:</strong> <span id="player-weight"></span> lbs</p>
+                    <p><strong>School:</strong> <span id="player-school"></span></p>
+                    <p><strong>Experience:</strong> <span id="player-exp"></span> yrs</p>
+                </div>
+            </div>
         </div>
             
     
@@ -153,5 +166,7 @@
 
         <div id="output" class="flex-item" style="visibility: hidden;"></div>
     </div>
+
+    <script src="./scripts.js"></script>
 </body>
 </html>
