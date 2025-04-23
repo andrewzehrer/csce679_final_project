@@ -558,6 +558,15 @@ async function updateGraph(data_filtered) {
 
 window.onload = () => {
     fetchPlayerStats();
+
+    document.getElementById("playerNameInput").addEventListener("input", () => {
+        handlePlayerInput();
+    });
+    
+    document.getElementById("seasonDropdown").addEventListener("change", () => {
+        fetchPlayerStats();
+    });
+
     document.getElementById("inputDiv").addEventListener("change", () => {
         updateGraph(data_filtered);
     });
