@@ -3,9 +3,8 @@ body {
     text-align: center;
     padding: 20px;
     background-image: url("https://wallpaperaccess.com/full/3694273.jpg");
-    background-size: stretch;
     background-position: center;
-    background-color: rgba(0,0,0,0.2); /* dark overlay */
+    background-color: rgba(0,0,0,0.2);
     background-blend-mode: darken;
 }
 
@@ -63,6 +62,8 @@ div {
     display: block;
     object-fit: contain;
 }
+
+
 
 #totalsTable {
     width: 80%;
