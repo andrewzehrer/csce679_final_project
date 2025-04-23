@@ -140,7 +140,7 @@ async function loadPlayerBio() {
         document.getElementById("bio").style.backgroundImage = `url('${bio.team_logo_url}')`;
 
         document.getElementById("player-name").textContent = bio.name;
-        document.getElementById("player-team").textContent = bio.team;
+        // document.getElementById("player-team").textContent = bio.team;
 
         // have to caluclate age from birthdate
         const birthdate = new Date(bio.birthdate);

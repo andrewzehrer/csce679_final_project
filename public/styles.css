@@ -69,7 +69,6 @@ div {
     background-size: cover;
     background-position: center;
     padding: 0px;
-    overflow: hidden;
 }
 
 .portrait-box {
@@ -89,17 +88,20 @@ div {
     background-color: rgba(255, 255, 255, 0.0);
 }
 
-  
 .bio-info {
     display: flex;
-    flex-wrap: wrap;
-    flex-direction: column;
+    flex-direction: row;
     align-items: flex-start;
     color: #000;
     padding: 15px;
     border-radius: 8px;
     background-color: rgba(255, 255, 255, 0.9);
-    box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+}
+
+#bio-info-text {
+    background-color: rgba(255, 255, 255, 0.0);
+    box-shadow: none;
+    padding: 0px;
 }
 
 #totalsTable {
