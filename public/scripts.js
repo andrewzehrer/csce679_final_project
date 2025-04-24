@@ -356,7 +356,7 @@ async function updateGraph(data_filtered) {
                 "x": { 
                     "field": "GAME_DATE", 
                     "type": "temporal",
-                    "axis": { "format": "%b" }
+                    "axis": { "format": "%b %e" }
                 },
                 "y": { 
                     "field": "value", 
@@ -414,7 +414,7 @@ async function updateGraph(data_filtered) {
                 "x": { 
                     "field": "GAME_DATE", 
                     "type": "temporal",
-                    "axis": { "format": "%b" }
+                    "axis": { "format": "%b %e" }
                 },
                 "y": { 
                     "field": "avg", 
@@ -611,9 +611,7 @@ async function updateGraph(data_filtered) {
                 "type": "quantitative", 
                 "bin": { "step": binSize }, 
                 "title": statText[selectedStat],
-                "axis": {
-                    "format": "d"
-                }
+                "axis": { "format": "d" }
             },
             "y": { 
                 "aggregate": 'count', 
