@@ -206,23 +206,19 @@ async function fetchPlayerStats() {
 
 //////////////////////////// Update graph and table totals without fetching ////////////////////////////
 async function updateGraph(data_filtered) {
+    if (!data_filtered) return;
+
+    // Get input values and filters from the UI
     const playerName = document.getElementById("playerNameInput").value;
     const seasonYear = document.getElementById("seasonDropdown").value.slice(0, 4);
-
-    if (!data_filtered) {
-        return;
-    }
-
     const homeAwayFilter = document.getElementById("locationDropdown").value;
     const teamFilter = document.getElementById("teamDropdown").value;
     const resultFilter = document.getElementById("resultDropdown").value;
-
     const showSeasonAvg = document.getElementById("showSeasonAvg").checked;
     const showRollingAvg = document.getElementById("showRollingAvg").checked;
-
     const selectedStat = getSelectedStat();
 
-    //////////////////////////////// Filter data for table totals & chart ////////////////////////////////
+    // Filter data for totals table and charts
     const passesFilters = (d) => {
         const isLocationOk = homeAwayFilter === "all"
             || (homeAwayFilter === "home" && d.MATCHUP.indexOf('vs.') !== -1)
@@ -238,6 +234,7 @@ async function updateGraph(data_filtered) {
         return isLocationOk && isTeamOk && isResultOk;
     };
 
+    // Convert to Vega-Lite filter expressions
     const locationExpr = homeAwayFilter === "all"
         ? "true"
         : homeAwayFilter === "home"
@@ -256,7 +253,7 @@ async function updateGraph(data_filtered) {
 
     const testExpr = `${locationExpr} && ${teamExpr} && ${resultExpr}`;
 
-    ///////////////////////////////// Chart layers /////////////////////////////////
+    // Initialize chart layers
     const activeSeries = [];
     const colors = [];
 
@@ -316,13 +313,9 @@ async function updateGraph(data_filtered) {
         }
     ];
 
-    //////////////////////////////// Calculate season averages ////////////////////////////////
+    // Calculate season average
     let seasonAverage = 0;
-
-    data_filtered.forEach(d => {
-        seasonAverage += d[selectedStat];
-    });
-
+    data_filtered.forEach(d => { seasonAverage += d[selectedStat]; });
     seasonAverage = (seasonAverage / data_filtered.length).toFixed(2);
 
     // Add Season Average line (if shown)
@@ -338,7 +331,7 @@ async function updateGraph(data_filtered) {
             "mark": { 
                 "type": "line", 
                 "strokeWidth": 2, 
-                "strokeDash": [4,2]
+                "strokeDash": [4, 2]
             },
             "encoding": {
                 "x": { 
@@ -349,18 +342,12 @@ async function updateGraph(data_filtered) {
                 "y": { 
                     "field": "value", 
                     "type": "quantitative",
-                    "axis": { 
-                        "orient": "left", 
-                        "title": ""
-                    }
+                    "axis": { "orient": "left", "title": "" }
                 },
                 "color": {
                     "field": "series",
                     "type": "nominal",
-                    "scale": { 
-                        "domain": activeSeries, 
-                        "range": colors 
-                    },
+                    "scale": { "domain": activeSeries, "range": colors },
                     "legend": showLegend ? { "title": "Legend" } : null
                 },
                 "tooltip": [
@@ -381,18 +368,13 @@ async function updateGraph(data_filtered) {
         const values = window.map(g => g[selectedStat]);
         const avg = values.reduce((sum, v) => sum + v, 0) / values.length;
 
-        return {
-            GAME_DATE: d.GAME_DATE,
-            avg: avg
-        };
+        return { GAME_DATE: d.GAME_DATE, avg: avg };
     });
 
     // Add Rolling 5-game Average line (if shown)
     if (showRollingAvg) {
         layers.push({
-            "data": { 
-                "values": rollingStats.map(d => ({...d, series: "5-game Avg"})) 
-            },
+            "data": { "values": rollingStats.map(d => ({...d, series: "5-game Avg"})) },
             "mark": { 
                 "type": "line", 
                 "strokeWidth": 2, 
@@ -407,18 +389,12 @@ async function updateGraph(data_filtered) {
                 "y": { 
                     "field": "avg", 
                     "type": "quantitative",
-                    "axis": { 
-                        "orient": "left", 
-                        "title": ""
-                    }
+                    "axis": { "orient": "left", "title": "" }
                 },
                 "color": {
                     "field": "series",
                     "type": "nominal",
-                    "scale": { 
-                        "domain": activeSeries, 
-                        "range": colors 
-                    },
+                    "scale": { "domain": activeSeries, "range": colors },
                     "legend": showLegend ? { "title": "Legend" } : null
                 },
                 "tooltip": [
@@ -459,7 +435,7 @@ async function updateGraph(data_filtered) {
 
     vegaEmbed("#vis", spec);
 
-    ///////////////////////////////// Display table totals ////////////////////////////////
+    // Display table totals
     const filteredForTotals = data_filtered.filter(passesFilters);
     const totals = { 
         "PTS": 0, 
@@ -515,7 +491,7 @@ async function updateGraph(data_filtered) {
     document.getElementById("stlStdDev").innerText = stdDevs.STL;
     document.getElementById("blkStdDev").innerText = stdDevs.BLK;
 
-    //////////////////////////////// Generate box plot ////////////////////////////////
+    // Generate box plot
     const boxPlotData = data_filtered.map(d => ({ [selectedStat]: d[selectedStat] }));
     const boxPlotSpec = {
         "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
@@ -547,9 +523,7 @@ async function updateGraph(data_filtered) {
                 "field": selectedStat, 
                 "type": "quantitative", 
                 "title": statText[selectedStat],
-                "axis": {
-                    "format": "d"
-                }
+                "axis": { "format": "d" }
             },
             "color": { "value": "steelblue" },
             "tooltip": [
@@ -564,11 +538,11 @@ async function updateGraph(data_filtered) {
 
     vegaEmbed("#boxPlot", boxPlotSpec);
 
-    //////////////////////////////// Generate histogram ////////////////////////////////
+    // Generate histogram 
     const histogramData = data_filtered.map(d => ({ [selectedStat]: d[selectedStat] }));
     histogramData.sort((a, b) => a[selectedStat] - b[selectedStat]);
 
-    // if selectedstat = steals or blocks, make the bins size 1, else 5
+    // If selectedstat = steals or blocks, make the bins size 1, else 5
     const binSize = (selectedStat === "STL" || selectedStat === "BLK") ? 1 : 5; 
     
     const histogramSpec = {
@@ -589,10 +563,7 @@ async function updateGraph(data_filtered) {
         "width": "container",
         "height": "container",
         "data": { "values": histogramData },
-        "mark": {
-            "type": "bar",
-            "tooltip": true,
-        },
+        "mark": { "type": "bar", "tooltip": true },
         "encoding": {
             "x": { 
                 "field": selectedStat, 
