@@ -173,8 +173,6 @@ async function fetchPlayerStats() {
     const seasonYear = document.getElementById("seasonDropdown").value.slice(0, 4);
 
     const url = `http://localhost:5000/player-games?name=${encodeURIComponent(playerName)}&season=${encodeURIComponent(seasonYear)}`;
-    // const outputDiv = document.getElementById("output");
-    // outputDiv.innerText = "Loading...";
 
     //////////////////////////////////// Fetch player stats from backend ////////////////////////////////
     try {
@@ -185,22 +183,11 @@ async function fetchPlayerStats() {
             }
         });
 
-        if (res.status === 404) {
-            outputDiv.innerText = "Player not found. Please check the name and try again.";
-            return;
-        } else if (res.status === 400) {
-            outputDiv.innerText = "Invalid request. Please check the input values.";
-            return;
-        } else if (!res.ok) {
-            outputDiv.innerText = "Error fetching data. Please try again later.";
-            return;
-        }
-
         const data = await res.json();
 
         if (data.error) {
             alert(data.error);
-            outputDiv.innerText = "No data found.";
+            console.log("No data found.");
             return;
         }
 
@@ -213,18 +200,16 @@ async function fetchPlayerStats() {
         });
 
         if (filtered.length === 0) {
-            outputDiv.innerText = "No data found for the specified player and season.";
+            console.log("No data found for the specified player and season.");
             return;
         }
 
         filtered.sort((a, b) => new Date(a.GAME_DATE) - new Date(b.GAME_DATE));
 
         data_filtered = filtered; // Store the filtered data as global variable
-        // document.getElementById("output").style.display = "none";
+
     } catch (err) {
         console.error("Fetch error:", err);
-        // document.getElementById("output").innerText = "Error fetching data. Check console.";
-        // document.getElementById("output").style.display = "flex";
     }
 
     // loadPlayerBio();
@@ -500,7 +485,6 @@ async function updateGraph(data_filtered) {
     };
 
     vegaEmbed("#vis", spec);
-    // outputDiv.innerText = "";
 
     ///////////////////////////////// Display table totals ////////////////////////////////
     const filteredForTotals = data_filtered.filter(passesFilters);
