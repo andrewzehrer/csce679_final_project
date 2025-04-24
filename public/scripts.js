@@ -158,19 +158,16 @@ async function loadPlayerBio() {
 
 ////////////////////////////// Main function to fetch player stats //////////////////////////////
 async function fetchPlayerStats() {
-    //////////////////////////////// Get input values ////////////////////////////////
+    // Get input values from the UI
     const playerName = document.getElementById("playerNameInput").value;
     const seasonYear = document.getElementById("seasonDropdown").value.slice(0, 4);
-
     const url = `http://localhost:5000/player-games?name=${encodeURIComponent(playerName)}&season=${encodeURIComponent(seasonYear)}`;
 
-    //////////////////////////////////// Fetch player stats from backend ////////////////////////////////
+    // Fetch data from the backend
     try {
         const res = await fetch(url, {
             method: "GET",
-            headers: {
-                "Content-Type": "application/json"
-            }
+            headers: { "Content-Type": "application/json" }
         });
 
         const data = await res.json();
@@ -181,7 +178,7 @@ async function fetchPlayerStats() {
             return;
         }
 
-        ////////////////////////////////// Filter and process data ////////////////////////////////
+        // Filter and process the data
         const filtered = data.filter(d => {
             const gameDate = new Date(d.GAME_DATE);
             const startDate = new Date(`${seasonYear}-10-01`); // Start of the season
@@ -189,20 +186,21 @@ async function fetchPlayerStats() {
             return gameDate >= startDate && gameDate <= endDate;
         });
 
+        // Check if filtered data is empty
         if (filtered.length === 0) {
             console.log("No data found for the specified player and season.");
             return;
         }
 
+        // Sort by date
         filtered.sort((a, b) => new Date(a.GAME_DATE) - new Date(b.GAME_DATE));
 
-        data_filtered = filtered; // Store the filtered data as global variable
-
+        // Store the filtered data as global variable
+        data_filtered = filtered; 
     } catch (err) {
         console.error("Fetch error:", err);
     }
 
-    // loadPlayerBio();
     updateGraph(data_filtered); 
 }
 
