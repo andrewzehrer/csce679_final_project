@@ -80,23 +80,22 @@ async function fetchPlayerSuggestions() {
 async function loadSeasons() {
     const playerName = document.getElementById("playerNameInput").value;
     const dropdown = document.getElementById("seasonDropdown");
+    dropdown.innerHTML = "";
 
+    // if no name, exit
     if (!playerName.trim()) return;
 
-    dropdown.style.display = "none";
-    dropdown.innerHTML = "<option>Loading...</option>";
-
     try {
+        // Fetch seasons from the backend
         const res = await fetch(`http://localhost:5000/player-seasons?name=${encodeURIComponent(playerName)}`);
         const seasons = await res.json();
 
+        // Check if the response is valid and seasons are available
         if (res.status !== 200 || seasons.length === 0) {
-            dropdown.innerHTML = "";
-            dropdown.style.display = "none";
             return;
         }
 
-        dropdown.innerHTML = "";
+        // Populate the dropdown with seasons
         seasons.forEach(season => {
             const option = document.createElement("option");
             option.value = season;
@@ -104,19 +103,12 @@ async function loadSeasons() {
             dropdown.appendChild(option);
         });
 
-        dropdown.style.display = "inline-block";
+        // Set it to the most recent season
+        dropdown.selectedIndex = 0;
 
-        const defaultSeason = "2024-25";
-        if (seasons.includes(defaultSeason)) {
-            dropdown.value = defaultSeason;
-        } else {
-            dropdown.selectedIndex = 0;
-        }
-
-        fetchPlayerStats(); // ← always call this here
+        fetchPlayerStats(); // always call this here
     } catch (err) {
         console.error("Error fetching seasons:", err);
-        dropdown.style.display = "none";
     }
 }
 
@@ -136,30 +128,28 @@ async function loadPlayerBio() {
             return;
         }
 
+        // Portrait and team logo
         document.getElementById("player-portrait").src = bio.portrait_url;
         document.getElementById("bio").style.backgroundImage = `url('${bio.team_logo_url}')`;
-
-        document.getElementById("player-name").textContent = bio.name;
-        // document.getElementById("player-team").textContent = bio.team;
 
         // have to caluclate age from birthdate
         const birthdate = new Date(bio.birthdate);
         const today = new Date();
-        const age = today.getFullYear() - birthdate.getFullYear();
+        const age = Math.floor((today - birthdate) / (1000 * 60 * 60 * 24 * 365)); 
 
-        // chop off the time part of the date
+        // format the birthdate to MM/DD/YYYY
         const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
         const birthdateString = birthdate.toLocaleDateString('en-US', options);
         const birthdateParts = birthdateString.split('/');
         const formattedBirthdate = `${birthdateParts[0]}/${birthdateParts[1]}/${birthdateParts[2]}`;
 
+        // Populate bio information
+        document.getElementById("player-name").textContent = bio.name;
         document.getElementById("player-birthdate").textContent = `${formattedBirthdate} (Age ${age})`;
-
         document.getElementById("player-height").textContent = bio.height;
         document.getElementById("player-weight").textContent = bio.weight;
         document.getElementById("player-school").textContent = bio.school;
         document.getElementById("player-exp").textContent = bio.experience;
-        
     } catch (err) {
         console.error("Error fetching player bio:", err);
         bioDiv.innerHTML = "Error loading player bio.";
