@@ -107,7 +107,6 @@ def player_bio():
         return jsonify({"error": str(e)}), 500
 
 # ------------------------ GAME LOGS + FILTERS ------------------------
-
 def get_player_game_logs(player_id, season='2024'):
     logs = playergamelog.PlayerGameLog(player_id=player_id, season=season)
     df = logs.get_data_frames()[0]
@@ -117,8 +116,6 @@ def get_player_game_logs(player_id, season='2024'):
 def player_games():
     name = request.args.get("name")
     season = request.args.get("season", "2024")
-    location = request.args.get("location")
-    opponent = request.args.get("vs")
 
     match = players.find_players_by_full_name(name)
     if not match:
@@ -127,19 +124,11 @@ def player_games():
     player_id = match[0]['id']
     df = get_player_game_logs(player_id, season)
 
-    # Applies filters
-    if location == "home":
-        df = df[df["MATCHUP"].str.contains("vs.")]
-    elif location == "away":
-        df = df[df["MATCHUP"].str.contains("@")]
-    if opponent:
-        df = df[df["MATCHUP"].str.contains(opponent.upper())]
-
     # Base columns
     filtered = df[["GAME_DATE", "MATCHUP", "WL", "PTS", "AST", "REB", "STL", "BLK"]]
     filtered = filtered.sort_values("GAME_DATE")
 
-    # Cleans NaN → null for frontend
+    # Cleans NaN -> None in data
     filtered = filtered.replace({np.nan: None})
     return jsonify(filtered.to_dict(orient="records"))
 

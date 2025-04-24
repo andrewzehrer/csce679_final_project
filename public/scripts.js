@@ -40,7 +40,7 @@ function getSelectedStat() {
     return selectedRadio.value;
 }
 
-function handlePlayerInput() {
+function handleUserInput() {
     clearTimeout(inputTimeout);
     fetchPlayerSuggestions();
 
@@ -644,7 +644,7 @@ window.onload = () => {
     fetchPlayerStats();
 
     document.getElementById("playerNameInput").addEventListener("input", () => {
-        handlePlayerInput();
+        handleUserInput();
     });
 
     document.getElementById("seasonDropdown").addEventListener("change", () => {
@@ -655,5 +655,5 @@ window.onload = () => {
         updateGraph(data_filtered);
     });
 
-    handlePlayerInput();
+    handleUserInput();
 }
