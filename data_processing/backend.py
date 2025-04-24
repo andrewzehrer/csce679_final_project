@@ -119,7 +119,6 @@ def player_games():
     season = request.args.get("season", "2024")
     location = request.args.get("location")
     opponent = request.args.get("vs")
-    # include_consistency = request.args.get("include_consistency", "false").lower() == "true"
 
     match = players.find_players_by_full_name(name)
     if not match:
@@ -128,10 +127,7 @@ def player_games():
     player_id = match[0]['id']
     df = get_player_game_logs(player_id, season)
 
-    # Formats GAME_DATE
-    # df["GAME_DATE"] = pd.to_datetime(df["GAME_DATE"])
-
-    # Applys filters
+    # Applies filters
     if location == "home":
         df = df[df["MATCHUP"].str.contains("vs.")]
     elif location == "away":
@@ -142,12 +138,6 @@ def player_games():
     # Base columns
     filtered = df[["GAME_DATE", "MATCHUP", "WL", "PTS", "AST", "REB", "STL", "BLK"]]
     filtered = filtered.sort_values("GAME_DATE")
-
-    # Adds consistency fields
-    # if include_consistency:
-    #     for stat in ["PTS", "AST", "REB"]:
-    #         filtered[f"{stat}_ROLLING_AVG"] = filtered[stat].rolling(5).mean().round(2)
-    #         filtered[f"{stat}_ROLLING_STD"] = filtered[stat].rolling(5).std().round(2)
 
     # Cleans NaN → null for frontend
     filtered = filtered.replace({np.nan: None})

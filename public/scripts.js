@@ -43,9 +43,9 @@ function getSelectedStat() {
 function handlePlayerInput() {
     clearTimeout(inputTimeout);
     fetchPlayerSuggestions();
-    loadPlayerBio();
 
     inputTimeout = setTimeout(() => {
+        loadPlayerBio();
         loadSeasons();
     }, 1000); // delay to reduce redundant fetches
 }
@@ -307,11 +307,6 @@ async function updateGraph(data_filtered) {
                         "orient": "left"
                     }
                 },
-                "scale": {
-                    "name": "y",
-                    "nice": true,
-                    "tickMinStep": 1
-                },
                 "color": {
                     "condition": { 
                         "test": testExpr, 
@@ -366,11 +361,6 @@ async function updateGraph(data_filtered) {
                 "y": { 
                     "field": "value", 
                     "type": "quantitative",
-                    "scale": {
-                        "name": "y",
-                        "nice": true,
-                        "tickMinStep": 1
-                    },
                     "axis": { 
                         "orient": "left", 
                         "title": ""
@@ -429,11 +419,6 @@ async function updateGraph(data_filtered) {
                 "y": { 
                     "field": "avg", 
                     "type": "quantitative",
-                    "scale": {
-                        "name": "y",
-                        "nice": true,
-                        "tickMinStep": 1
-                    },
                     "axis": { 
                         "orient": "left", 
                         "title": ""
@@ -594,6 +579,9 @@ async function updateGraph(data_filtered) {
     //////////////////////////////// Generate histogram ////////////////////////////////
     const histogramData = data_filtered.map(d => ({ [selectedStat]: d[selectedStat] }));
     histogramData.sort((a, b) => a[selectedStat] - b[selectedStat]);
+
+    // if selectedstat = steals or blocks, make the bins size 1, else 5
+    const binSize = (selectedStat === "STL" || selectedStat === "BLK") ? 1 : 5; 
     
     const histogramSpec = {
         "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
@@ -621,7 +609,7 @@ async function updateGraph(data_filtered) {
             "x": { 
                 "field": selectedStat, 
                 "type": "quantitative", 
-                "bin": { "step": 5 }, 
+                "bin": { "step": binSize }, 
                 "title": statText[selectedStat],
                 "axis": {
                     "format": "d"
@@ -636,7 +624,7 @@ async function updateGraph(data_filtered) {
             "tooltip": [
                 {
                     "field": selectedStat,
-                    "bin": { "step": 5 },
+                    "bin": { "step": binSize },
                     "type": "quantitative",
                     "title": selectedStat
                 },
