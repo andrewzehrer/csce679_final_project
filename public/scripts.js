@@ -1,6 +1,9 @@
 let inputTimeout;
 let data_filtered;
 
+/**
+ * Mapping of stat codes to their display names
+ */
 const statText = {
     "PTS": "Points",
     "AST": "Assists",
@@ -9,6 +12,10 @@ const statText = {
     "BLK": "Blocks"
 };
 
+/**
+ * Creates title for the visualization based on current filters
+ * @returns {string} Formatted title string
+ */
 function getGraphTitle() {
     const playerName = document.getElementById("playerNameInput").value;
     const seasonYear = document.getElementById("seasonDropdown").value.slice(0, 4);
@@ -35,11 +42,18 @@ function capitalize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
+/**
+ * Gets the currently selected stat from the radio buttons
+ * @returns {string} Selected stat code (PTS, AST, REB, STL, or BLK)
+ */
 function getSelectedStat() {
     const selectedRadio = document.querySelector('input[name="stat"]:checked');
     return selectedRadio.value;
 }
 
+/**
+ * Handles user input and triggers player suggestions immediately but delays bio and season loading
+ */
 function handleUserInput() {
     clearTimeout(inputTimeout);
     fetchPlayerSuggestions();
@@ -50,6 +64,10 @@ function handleUserInput() {
     }, 1000); // delay to reduce redundant fetches
 }
 
+/**
+ * Fetches player name suggestions for autocomplete based on current input
+ * Updates the datalist with matching player names
+ */
 async function fetchPlayerSuggestions() {
     const input = document.getElementById("playerNameInput");
     const datalist = document.getElementById("playerSuggestions");
@@ -76,7 +94,9 @@ async function fetchPlayerSuggestions() {
     }
 }
 
-// Load seasons for a selected player
+/**
+ * Loads available seasons for the selected player
+ */
 async function loadSeasons() {
     const playerName = document.getElementById("playerNameInput").value;
     const dropdown = document.getElementById("seasonDropdown");
@@ -112,7 +132,9 @@ async function loadSeasons() {
     }
 }
 
-// Load player bio information
+/**
+ * Loads and displays player portrait, team logo, and personal details
+ */
 async function loadPlayerBio() {
     const playerName = document.getElementById("playerNameInput").value;
     const bioDiv = document.getElementById("bio");
@@ -156,7 +178,11 @@ async function loadPlayerBio() {
     }
 }
 
-////////////////////////////// Main function to fetch player stats //////////////////////////////
+/**
+ * Main function to fetch player game statistics from the backend
+ * Retrieves game-by-game data for the selected player and season
+ * Filters data to the appropriate season range and triggers visualization updates
+ */
 async function fetchPlayerStats() {
     // Get input values from the UI
     const playerName = document.getElementById("playerNameInput").value;
@@ -204,7 +230,12 @@ async function fetchPlayerStats() {
     updateGraph(data_filtered); 
 }
 
-//////////////////////////// Update graph and table totals without fetching ////////////////////////////
+/**
+ * Updates all visualizations based on the current filtered data and UI selections
+ * Creates bar chart, rolling averages, box plot, and histogram
+ * Also updates the statistics summary table
+ * @param {Array} data_filtered - Array of filtered game data objects
+ */
 async function updateGraph(data_filtered) {
     if (!data_filtered) return;
 
@@ -597,6 +628,10 @@ async function updateGraph(data_filtered) {
     vegaEmbed("#histogram", histogramSpec);
 }
 
+/**
+ * Initialize the application when the page loads
+ * Set up event listeners and loads initial data
+ */
 window.onload = () => {
     fetchPlayerStats();
 

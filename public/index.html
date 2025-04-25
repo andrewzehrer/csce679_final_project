@@ -4,14 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NBA Player Game Log</title>
+    <!-- External stylesheet for custom styling -->
     <link rel="stylesheet" href="styles.css">
+    <!-- Vega visualization libraries for interactive charts -->
     <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
 </head>
 <body>
+    <!-- Main container with flexbox layout -->
     <div class="flex-container-wrapper">
         <div class="flex-container">
+            <!-- Application header with title and author information -->
             <div id="header" class="flex-item">
                 <h2>NBA Stat Viz</h2>
                 <h3>A tool to visualize NBA player performance, consistency, and more</h3>
@@ -34,7 +38,7 @@
                     </div>
                 </div>
             </div>
-
+            <!-- User input controls for data filtering and visualization options -->
             <div id="inputDiv" class="flex-item">
                 <strong>Player Name:</strong>
                 <input 
@@ -46,7 +50,7 @@
                 <select id="seasonDropdown" style="display: inline;" value="2024-25"></select>
         
                 <br><br>
-        
+                <!-- Stat selection radio buttons for different metrics -->
                 <strong>Select a Stat:</strong>
                 <label><input type="radio" name="stat" value="PTS" checked> Points</label>
                 <label><input type="radio" name="stat" value="AST"> Assists</label> 
@@ -120,12 +124,16 @@
                 <label><input type="checkbox" id="showRollingAvg" checked onchange="fetchPlayerStats()"> Show 5-Game Average</label>
             </div>
 
+            <!-- Main bar graph container for game-by-game stats -->
             <div id="vis" class="flex-item"></div>
 
+            <!-- Histogram visualization for stat distribution -->
             <div id="histogram" class="flex-item"></div>
 
+            <!-- Box plot visualization for statistical variance -->
             <div id="boxPlot" class="flex-item"></div>
 
+            <!-- Summary statistics table -->
             <div id="totals" class="flex-item">
                 <table id="totalsTable">
                     <thead>
