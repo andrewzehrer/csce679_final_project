@@ -1,5 +1,3 @@
-# csce679_final_project
-
 # NBA Stats Visualization Dashboard
 
 An interactive web application to explore and analyze NBA player performance, consistency, and game-level statistics. Built with **Flask**, **Vega-Lite**, and **nba_api**, this tool is designed for fantasy players, bettors, analysts, and fans who want to dive deeper into player trends across the season.
@@ -27,12 +25,30 @@ cd csce679_final_project
 ```
 
 
-### 2. Install Dependencies
+### 2. Dependencies
+
+Make sure the following are installed on your system:
+
+- Python >= 3.7
+- Node.js >= 16
+- npm >= 8
+- pip (Python package installer) – comes with Python 3 (`pip3 --version`)
+
+
+Create virtual environment and install all project dependencies:
+
 ```
-python version 3.7 +
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
 
-install npm 
-
-install npa api
+### 3. Start the Application inside venv
 
 ```
+npm start 
+```
+### 4. Open in your browser
+
+Your app should now be live at: http://localhost:8800
+
