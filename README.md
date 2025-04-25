@@ -39,7 +39,13 @@ Create virtual environment and install all project dependencies:
 
 ```
 python3 -m venv venv
-source venv/bin/activate
+
+source venv/bin/activate  # macOS/Linux
+# OR
+.\venv\Scripts\Activate   # Windows PowerShell
+# OR
+venv\Scripts\activate.bat # Windows CMD
+
 pip install -r requirements.txt
 ```
 
@@ -52,3 +58,29 @@ npm start
 
 Your app should now be live at: http://localhost:8800
 
+![Web App Preview](public/webview.png)
+
+
+
+
+## Project Structure
+```
+csce679_final_project/
+├── data_processing/
+│   └── backend.py        # Flask API backend
+├── public/
+│   ├── index.html        # Main HTML interface
+│   ├── scripts.js        # Frontend logic + Vega-Lite
+│   ├── styles.css        # Custom styles
+│   └── webview.png       # Demo preview image
+├── requirements.txt      # Python dependencies
+└── README.md             # Project Setup and Structure
+```
+
+## Contributors
+
+Steve Wang: https://github.com/SteveWang110 
+
+Andrew Zeher: https://github.com/andrewzehrer
+
+Kai Zhao: https://github.com/kaiqizhao96 
